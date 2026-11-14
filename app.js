@@ -10,7 +10,7 @@
   };
   const tierNames={all:'全部',red:'红榜',black:'黑榜',mixed:'争议',unknown:'未分榜'};
   const zones=['虎溪','A 区','B 区','C 区','老校区周边'];
-  const zoneLabels=['科学城 · 虎溪','沙坪坝 · A 校园','沙坪坝 · B 校园','沙坪坝 · C 校园','沙坪坝 · 未细分'];
+  const zoneLabels=['科学城 · 虎溪','沙坪坝 · A 校区','沙坪坝 · B 校区','沙坪坝 · C 校区','沙坪坝 · 未细分'];
   const isDelivery=document.body.dataset.page==='delivery';
   const ext=(label,url)=>h('a',{href:url,target:'_blank',rel:'noopener noreferrer'},label+' ↗');
   const sources=new Map();
@@ -22,7 +22,7 @@
     $('#total').textContent=records.length;
     $('#redTotal').textContent=records.filter(r=>r.tier==='red').length;
     $('#blackTotal').textContent=records.filter(r=>r.tier==='black').length;
-    zones.forEach((z,i)=>$('#area-grid').append(h('a',{class:'area',href:'guide.html?zone='+encodeURIComponent(z)},[h('span',{},zoneLabels[i]),h('strong',{},z+' · '+coverage[i]),h('i',{'aria-hidden':'true',style:'--coverage:'+(100*coverage[i]/Math.max(...coverage))+'%'})])));
+    zones.forEach((z,i)=>$('#area-grid').append(h('a',{class:'area',href:'guide.html?zone='+encodeURIComponent(z)},[h('span',{},zoneLabels[i]),h('strong',{},String(coverage[i]))])));
   }
   const form=$('#filters');
   if(!form) return;
