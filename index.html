@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#f8f2e7">
+  <meta name="theme-color" content="#fff9ec">
   <meta name="description" content="重庆大学非官方校园美食指南。学生共创原表、校区检索和可追溯的门店参考。">
   <title>重大开饭 · 重庆大学美食红黑榜</title>
   <link rel="icon" href="mark.svg" type="image/svg+xml">
-  <link rel="preload" as="image" type="image/webp" href="noodles.webp" fetchpriority="high">
+  <link rel="preload" as="image" href="cqu-avatar.jpg" fetchpriority="high">
   <link rel="preload" as="font" href="fonts/editorial-sc.woff2" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css?v=campus-notes-1">
+  <link rel="stylesheet" href="style.css?v=sticker-1">
   <script src="data.js" defer></script>
   <script src="ratings.js" defer></script>
   <script src="app.js?v=campus-notes-1" defer></script>
@@ -17,7 +17,7 @@
 <body data-page="home">
 <a class="skip" href="#main">跳到正文</a>
 <header class="mast frame">
-    <a class="brand" href="./"><img src="mark.svg" width="38" height="38" alt=""><span><b>重大开饭</b><small>CQU FOOD INDEX</small></span></a>
+    <a class="brand" href="./"><span class="avatar-crop"><img src="cqu-avatar.jpg" width="1280" height="2781" alt=""></span><span class="brand-copy"><b>重大开饭</b><small>CQU FOOD INDEX</small></span></a>
     <nav aria-label="主导航"><a href="./" aria-current="page">首页</a><a href="guide.html">红黑榜</a><a href="sources.html">数据</a></nav>
     <a class="nav-cta" href="guide.html">查榜 <span aria-hidden="true">↗</span></a>
   </header>
@@ -29,13 +29,16 @@
         <p class="intro">从虎溪到沙坪坝，食堂窗口到校门口。<br>吃过的、踩过的、各说各话的，都记在这儿。</p>
         <div class="hero-actions"><a class="solid" href="guide.html">逛红黑榜 <span aria-hidden="true">↗</span></a></div>
         <span class="edition">VOL. 01 <i></i> 2026.11 <i></i> CHONGQING, CN</span>
-        <img class="hero-stamp" src="stamp.svg?v=campus-notes-1" width="114" height="114" alt="">
       </div>
-      <figure class="hero-art">
-        <picture><source srcset="noodles.webp" type="image/webp" width="960" height="720"><img src="noodles.jpg" width="1448" height="1086" fetchpriority="high" decoding="async" alt="红油小面主题配图，筷子挑起面条"></picture>
-        <div class="photo-top" aria-hidden="true"><span>风味档案 / 01</span></div>
-        <figcaption><div><small>CHONGQING · CAMPUS EATS</small><strong>这一站，山城饭点。</strong></div><span>主题配图</span></figcaption>
-      </figure>
+      <div class="hero-art">
+        <span class="art-label" aria-hidden="true">CQU CAMPUS EATS</span>
+        <svg class="doodle art-star" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#star"/></svg>
+        <svg class="doodle art-bowl" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#bowl"/></svg>
+        <figure class="hero-portrait">
+          <span class="portrait-say" aria-hidden="true">饭点到啦！</span>
+          <span class="avatar-crop"><img src="cqu-avatar.jpg" width="1280" height="2781" fetchpriority="high" decoding="async" alt="蓝发、戴着淡黄色 CQU 帽子的卡通头像，下方写着「早睡早起身体好」"></span>
+        </figure>
+      </div>
     </section>
     <section class="ticker" aria-label="收录概况">
       <div><strong id="total">—</strong><span><small>THE INDEX</small>条收录记录</span></div>
@@ -44,39 +47,20 @@
       <div><strong>2</strong><span><small>THE SOURCES</small>份学生原表</span></div>
     </section>
     <section class="areas section" id="areas">
-      <div class="section-head"><div><p class="eyebrow" lang="en">01 / CAMPUS INDEX</p><h2>你在哪儿吃？</h2></div><p>选一个校区，看看附近有什么好吃的。</p></div>
+      <div class="section-head"><div><p class="eyebrow" lang="en">01 / CAMPUS INDEX</p><h2>你在哪儿吃？ <svg class="doodle title-doodle" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#pin"/></svg></h2></div><p>选一个校区，看看附近有什么好吃的。</p></div>
       <div class="area-grid" id="area-grid"></div>
-      <aside class="campus-notes" aria-labelledby="campus-notes-title">
-        <div class="notes-intro">
-          <p class="eyebrow" lang="en">CQU / FIELD NOTES</p>
-          <h3 id="campus-notes-title">重大饭友手记</h3>
-          <p>下课铃一响，食堂见。</p>
-        </div>
-        <div class="notes-tickets">
-          <a class="campus-ticket ticket-huxi" href="guide.html?zone=%E8%99%8E%E6%BA%AA&amp;spot=huxi-first&amp;service=dine-in">
-            <img src="doodle-canteen.svg" width="80" height="72" alt="" loading="lazy" decoding="async">
-            <span class="ticket-copy"><small>01 / 虎溪</small><strong>一食堂</strong><span>上楼看看吃什么</span></span>
-            <span class="ticket-arrow" aria-hidden="true">↗</span>
-          </a>
-          <a class="campus-ticket ticket-lake" href="guide.html?zone=A%20%E5%8C%BA&amp;spot=a-lake&amp;service=dine-in">
-            <img src="doodle-lake.svg" width="80" height="72" alt="" loading="lazy" decoding="async">
-            <span class="ticket-copy"><small>02 / 沙坪坝 A 区</small><strong>民主湖</strong><span>沿着湖去吃饭</span></span>
-            <span class="ticket-arrow" aria-hidden="true">↗</span>
-          </a>
-        </div>
-      </aside>
     </section>
     <section class="section routes" aria-labelledby="routes-title">
-      <div class="section-head"><div><p class="eyebrow" lang="en">02 / WHAT'S FOR DINNER</p><h2 id="routes-title">这顿怎么吃？</h2></div><p>按你今天的饭局筛选红黑榜。</p></div>
+      <div class="section-head"><div><p class="eyebrow" lang="en">02 / WHAT'S FOR DINNER</p><h2 id="routes-title">这顿怎么吃？ <svg class="doodle title-doodle" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#bowl"/></svg></h2></div><p>按你今天的饭局筛选红黑榜。</p></div>
       <div class="route-grid">
-        <a href="guide.html?party=two"><span>01 / DATE NIGHT</span><strong>两个人慢慢吃</strong><small>双人约会 · 找适合坐下来聊的地方</small><b aria-hidden="true">↗</b></a>
-        <a href="guide.html?party=many"><span>02 / SHARING TABLE</span><strong>约一桌朋友</strong><small>六人以上 · 从适合分食的餐型找</small><b aria-hidden="true">↗</b></a>
-        <a href="guide.html?service=delivery"><span>03 / DELIVERY</span><strong>今天不出门</strong><small>在红黑榜筛选原表标明的外卖线索</small><b aria-hidden="true">↗</b></a>
+        <a href="guide.html?party=two"><span>01 / DATE NIGHT</span><strong>两个人慢慢吃</strong><small>双人约会 · 找适合坐下来聊的地方</small><b aria-hidden="true">↗</b><svg class="doodle route-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#heart"/></svg></a>
+        <a href="guide.html?party=many"><span>02 / SHARING TABLE</span><strong>约一桌朋友</strong><small>六人以上 · 从适合分食的餐型找</small><b aria-hidden="true">↗</b><svg class="doodle route-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#bowl"/></svg></a>
+        <a href="guide.html?service=delivery"><span>03 / DELIVERY</span><strong>今天不出门</strong><small>在红黑榜筛选原表标明的外卖线索</small><b aria-hidden="true">↗</b><svg class="doodle route-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#bag"/></svg></a>
       </div>
     </section>
 
     <section class="section picks" aria-labelledby="picks-title">
-      <div class="section-head"><div><p class="eyebrow" lang="en">03 / TODAY'S PICK</p><h2 id="picks-title">今天吃这个</h2></div><button id="repick" class="linkbtn" type="button" aria-controls="pick-grid">换一批</button></div>
+      <div class="section-head"><div><p class="eyebrow" lang="en">03 / TODAY'S PICK</p><h2 id="picks-title">今天吃这个 <svg class="doodle title-doodle" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#star"/></svg></h2></div><button id="repick" class="linkbtn" type="button" aria-controls="pick-grid">换一批</button></div>
       <div class="pick-grid" id="pick-grid" aria-live="polite"></div>
     </section>
 </main>
