@@ -237,19 +237,32 @@ body[data-page=sources] .page-doodle { right: 8%; top: 18% }
 .pager { min-width: 39px; font-family: var(--mono) }
 .spot-filter { grid-column: 1/-1; justify-self: start; color: var(--red-dark); border-color: #dab1a0; background: var(--red-light) }
 
+body[data-page=sources] { --note-edge: #d5deec; --note-sheet: #f0f4fc; --note-shadow: 0 3px 0 #e0e6f0 }
 .method { margin-bottom: 20px }
-.method-grid article { display: flex; flex-direction: column; padding: clamp(16px,2.4vw,29px); gap: 10px }
-.method-grid article:nth-child(1) { background: #fff6dc }
-.method-grid article:nth-child(2) { background: #f6f8ff }
-.method-grid article:nth-child(3) { background: #fff1ea }
-.method-grid article > span { color: var(--red); font-size: 12px; font-weight: 700 }
+.method-grid article {
+  display: flex; flex-direction: column; align-items: start; gap: 9px; padding: clamp(16px,2.4vw,29px);
+  border-color: var(--note-edge); box-shadow: var(--note-shadow);
+}
+.method-grid article > span {
+  background: var(--note-sheet); color: var(--blue); border: 1px solid var(--note-edge);
+  border-radius: 99px; padding: 2px 9px; font-size: 12px; font-weight: 700;
+}
 .method-grid h3 { font-size: clamp(18px,2.2vw,25px); line-height: 1.3 }
 .method-grid p, .method-grid li { color: var(--muted); font-size: 14px }
-.method-grid ul { padding-left: 18px; margin: auto 0 0; padding-top: 8px }
-.download-panel { border-radius: var(--radius); border: 1px solid var(--line); background: var(--moss-light); box-shadow: var(--sticker-shadow); padding: clamp(18px,3.5vw,44px); margin: 0 0 48px; display: flex; justify-content: space-between; align-items: end; gap: 15px; flex-wrap: wrap }
+.source-group { width: 100%; margin-top: 5px; padding-top: 10px; border-top: 1px dashed var(--note-edge) }
+.source-group h4 { margin: 0 0 6px; color: var(--blue); font-size: 12px; letter-spacing: .04em }
+.original-tables { margin: 0; padding-left: 19px }
+.original-tables li + li { margin-top: 3px }
+.original-tables li::marker { color: var(--blue) }
+.source-tags { display: flex; flex-wrap: wrap; gap: 5px; list-style: none; margin: 0; padding: 0 }
+.source-tags li { padding: 2px 8px; border-radius: 7px; background: var(--note-sheet); color: var(--blue); font-size: 12px }
+.download-panel { border-radius: var(--radius); border: 1px solid var(--note-edge); background: var(--note-sheet); box-shadow: var(--note-shadow); padding: clamp(18px,3.5vw,44px); margin: 0 0 48px; display: flex; justify-content: space-between; align-items: end; gap: 15px; flex-wrap: wrap }
 .download-panel h2 { font-size: clamp(26px,3vw,39px); margin-bottom: 8px }
-.download-panel p:not(.eyebrow) { color: var(--moss); max-width: 65ch; font-size: 14px }
+.download-panel p:not(.eyebrow) { color: var(--muted); max-width: 65ch; font-size: 14px }
+.method .eyebrow, .download-panel .eyebrow { color: var(--blue) }
 .download-actions { display: flex; flex-wrap: wrap; gap: 7px }
+.download-actions .solid { background: var(--blue); border-color: var(--blue); color: #fff }
+.download-actions .outline { background: var(--surface); border-color: #bccde6; color: var(--blue) }
 
 footer.frame { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 9px 24px; border-top: 1px dashed #cbbc9e; padding-block: 17px 26px; color: var(--muted); font-size: 12px }
 footer strong { color: var(--ink); font-size: 18px }
@@ -287,6 +300,8 @@ html:has(dialog[open]) { overflow: hidden }
   .mast nav a:hover { color: var(--red); background: var(--red-light) }
   .nav-cta:hover, .solid:hover { color: #fff8e9; background: var(--red-dark); border-color: var(--red-dark) }
   .outline:not(:disabled):hover, #surprise:not(:disabled):hover, .linkbtn:hover, .tiers button:not([aria-pressed=true]):hover, .pager:not([aria-current=page]):hover { color: var(--red-dark); border-color: #cba491; background: var(--red-light) }
+  .download-actions .solid:hover { background: #334e77; border-color: #334e77 }
+  .download-actions .outline:hover { background: var(--blue-light); border-color: #a9bfdf; color: #334e77 }
   .solid:hover span, .outline:hover span, .nav-cta:hover span, .area:hover .area-arrow, .route-grid a:hover b { transform: translate(2px,-2px) }
   .area:hover, .route-grid a:hover, .pick:hover, .card:hover { transform: translateY(-3px); border-color: #b88f78 }
   .area:first-child:hover { background: #dce9fc; border-color: #9bb3da }

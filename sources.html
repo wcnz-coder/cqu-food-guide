@@ -7,7 +7,7 @@
   <meta name="description" content="重庆大学非官方校园美食指南。学生共创原表、校区检索和可追溯的门店参考。">
   <title>数据与出处 · 重大开饭</title>
   <link rel="icon" href="mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=sticker-1">
+  <link rel="stylesheet" href="style.css?v=source-notes-1">
   <script src="data.js" defer></script>
   <script src="ratings.js" defer></script>
   <script src="app.js?v=editorial-1" defer></script>
@@ -23,8 +23,27 @@
     <section class="method section" id="sources" aria-labelledby="method-title">
       <div class="page-intro"><div><p class="eyebrow">03 / SOURCE NOTES</p><h1 id="method-title">这份榜怎么来的</h1><p class="page-deck">有评价，也有证据边界。</p></div><svg class="doodle page-doodle" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#book"/></svg></div>
       <div class="method-grid">
-        <article><span>01 / 原表</span><h3>不把意见变成分数</h3><p>按原表榜区、明确标记及底色还原分榜。标为争议或合并后标记相冲突的保留在争议榜，无法确定榜单的条目不收录。相似店名不同校区不合并。</p><ul><li>重大饭协红黑榜</li><li>重庆大学 A 区食堂红黑榜</li></ul></article>
-        <article><span>02 / 补充</span><h3>门店有出处，评分不混用</h3><p>外部资料按条标注。网络评分由有出处的同店评分计算，和学生榜单分开。满分统一换算为 5；同数据源的不同站点不重复纳入。有样本量时权重为 √评论数（最高 10），未知样本量时权重为 1。饿了么同店数据未获公开核验。</p><ul id="source-names"></ul></article>
+        <article>
+          <span>01 / 原表</span>
+          <h3>不把意见变成分数</h3>
+          <p>按原表榜区、明确标记及底色还原分榜。标为争议或合并后标记相冲突的保留在争议榜，无法确定榜单的条目不收录。相似店名不同校区不合并。</p>
+          <div class="source-group">
+            <h4 id="original-tables">两份学生原表</h4>
+            <ul class="original-tables" aria-labelledby="original-tables">
+              <li>重大饭协红黑榜</li>
+              <li>重庆大学 A 区食堂红黑榜</li>
+            </ul>
+          </div>
+        </article>
+        <article>
+          <span>02 / 补充</span>
+          <h3>门店有出处，评分不混用</h3>
+          <p>外部资料按条标注。网络评分由有出处的同店评分计算，和学生榜单分开。满分统一换算为 5；同数据源的不同站点不重复纳入。有样本量时权重为 √评论数（最高 10），未知样本量时权重为 1。饿了么同店数据未获公开核验。</p>
+          <div class="source-group">
+            <h4 id="extra-sources">补充资料</h4>
+            <ul id="source-names" class="source-tags" role="list" aria-labelledby="extra-sources"></ul>
+          </div>
+        </article>
         <article><span>03 / 清洗</span><h3>去重复，保留不确定</h3><p>剔除模板、空白和明显越界条目；归一化楼层和价格区间。仅提取学生反馈的口味、分量等摘要标签，不转载投稿人信息。旧价和营业线索不代表现状。未标注的测评日期显示为未知，绝不拿采集日代替。</p></article>
       </div>
     </section>
