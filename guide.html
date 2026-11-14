@@ -17,7 +17,7 @@
 <a class="skip" href="#main">跳到正文</a>
 <header class="mast frame">
     <a class="brand" href="./"><img src="mark.svg" width="38" height="38" alt=""><span><b>重大开饭</b><small>CQU FOOD INDEX</small></span></a>
-    <nav aria-label="主导航"><a href="./">首页</a><a href="guide.html" aria-current="page">红黑榜</a><a href="delivery.html">外卖</a><a href="sources.html">数据</a></nav>
+    <nav aria-label="主导航"><a href="./">首页</a><a href="guide.html" aria-current="page">红黑榜</a><a href="sources.html">数据</a></nav>
     <a class="nav-cta" href="#guide">查榜 <span aria-hidden="true">↗</span></a>
   </header>
   <main id="main" class="frame">
@@ -32,7 +32,7 @@
         <label class="select party-select"><span>人数</span><select name="party" aria-label="用餐人数" aria-describedby="party-note"><option value="">不限</option><option value="one">1 人 · 独食</option><option value="two">2 人 · 约会</option><option value="few">3–5 人 · 小聚</option><option value="many">6 人以上 · 聚餐</option></select></label>
         <p class="filter-note" id="party-note">人数依据餐型与已知场景筛选，不代表有空桌、能拼桌或能包场。</p>
       </form>
-      <div class="tier-row"><span class="filter-label" aria-hidden="true">榜单</span><div class="tiers" id="tiers" role="group" aria-label="榜单类型"></div></div>
+      <div class="tier-row"><span class="filter-label" aria-hidden="true">榜单</span><div class="tiers" id="tiers" role="group" aria-label="榜单与外卖筛选"></div></div>
       <div class="results-top"><output id="result-count" aria-live="polite"></output><button class="linkbtn" id="reset" hidden>清空筛选</button></div>
       <div id="results" class="cards"></div>
       <noscript><p class="empty">请启用 JavaScript 浏览榜单，或前往数据页查看原表。</p></noscript>
@@ -40,7 +40,7 @@
     </section>
 
 </main>
-<footer class="frame"><strong>重大开饭</strong><span>学生资料整理 · 非重庆大学官方发布 · 数据截至 <time datetime="2026-11">2026.11</time></span><small>特别鸣谢：重大饭协、重大26级计软群、重大小天摄影干饭群</small><div class="footer-links"><a href="delivery.html">外卖</a><a href="sources.html">数据</a><a href="downloads/source-rows.csv" download>原数据 ↓</a><a href="#">回到顶部 ↑</a></div></footer>
+<footer class="frame"><strong>重大开饭</strong><span>学生资料整理 · 非重庆大学官方发布 · 数据截至 <time datetime="2026-11">2026.11</time></span><small>特别鸣谢：重大饭协、重大26级计软群、重大小天摄影干饭群</small><div class="footer-links"><a href="sources.html">数据</a><a href="downloads/source-rows.csv" download>原数据 ↓</a><a href="#">回到顶部 ↑</a></div></footer>
   <dialog id="detail" aria-labelledby="detail-title"><div class="sheet"><button class="close" type="button" aria-label="关闭">×</button><div id="detail-body"></div></div></dialog>
 </body>
 </html>

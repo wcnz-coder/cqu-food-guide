@@ -11,7 +11,6 @@
   const tierNames={all:'全部',red:'红榜',black:'黑榜',mixed:'争议'};
   const zones=['虎溪','A 区','B 区','C 区','老校区周边'];
   const zoneLabels=['科学城 · 虎溪','沙坪坝 · A 校区','沙坪坝 · B 校区','沙坪坝 · C 校区','沙坪坝 · 老校区'];
-  const isDelivery=document.body.dataset.page==='delivery';
   const sources=new Set();
   for(const r of records)for(const s of [...r.external,...r.ratings])sources.add(s.platform);
   for(const s of context)if(!s.platform.startsWith('饿了么'))sources.add(s.platform);
@@ -63,7 +62,7 @@
   const fields=form.elements, dlg=$('#detail'), grid=$('#results');
   const paramFields=['q','zone','category','budget','evidence','party'];
   const limit=18, params=new URLSearchParams(location.search);
-  if(!isDelivery&&zones.includes(params.get('zone'))) {
+  if(zones.includes(params.get('zone'))) {
     try{sessionStorage.setItem(areaKey,params.get('zone'));}catch{}
   }
   const norm=s=>String(s).normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,'');
@@ -92,10 +91,10 @@
     }
     return 0;
   }
-  const scope=records.filter(r=>!isDelivery||r.delivery);
-  const idx=scope.map(r=>({r,title:[r.name,r.dish].filter(Boolean).map(norm),meta:[r.zone,r.venue,r.floor,r.location,r.category,r.features,...r.signals].map(norm)}));
-  const byId=new Map(scope.map(r=>[r.id,r]));
+  const idx=records.map(r=>({r,title:[r.name,r.dish].filter(Boolean).map(norm),meta:[r.zone,r.venue,r.floor,r.location,r.category,r.features,...r.signals].map(norm)}));
+  const byId=new Map(records.map(r=>[r.id,r]));
   let selected=Object.keys(tierNames).includes(params.get('tier'))?params.get('tier'):'all', page=Math.max(1,Number.parseInt(params.get('page'),10)||1), visible=[], lastDraw=null;
+  let deliveryOnly=params.get('delivery')==='1';
   for(const z of zones)fields.zone.append(h('option',{value:z},z));
   for(const c of [...new Set(records.map(r=>r.category))])fields.category.append(h('option',{value:c},c));
   for(const name of paramFields) {
@@ -165,6 +164,7 @@
       if(fields[name].value.trim())u.searchParams.set(name,fields[name].value.trim());else u.searchParams.delete(name);
     }
     if(selected==='all')u.searchParams.delete('tier');else u.searchParams.set('tier',selected);
+    if(deliveryOnly)u.searchParams.set('delivery','1');else u.searchParams.delete('delivery');
     if(page===1)u.searchParams.delete('page');else u.searchParams.set('page',page);
     if(u.href!==location.href)history.replaceState(null,'',u);
   }
@@ -177,14 +177,20 @@
         const scores=q.map(t=>Math.max(0,...title.map(s=>match(t,s)*3),...meta.map(s=>s.includes(t)?12:0)));
         return {r,score:scores.every(Boolean)?scores.reduce((a,b)=>a+b,0):-1};
       }).filter(x=>x.score>=0);
-    const counts=Object.fromEntries(Object.keys(tierNames).map(t=>[t,0]));counts.all=pool.length;for(const {r} of pool)counts[r.tier]++;
+    const filtered=deliveryOnly?pool.filter(({r})=>r.delivery):pool;
+    const counts=Object.fromEntries(Object.keys(tierNames).map(t=>[t,0]));counts.all=filtered.length;for(const {r} of filtered)counts[r.tier]++;
     const tierBox=$('#tiers'), active=document.activeElement?.dataset?.tier;
+    const deliveryFocused=document.activeElement?.id==='delivery-only';
+    const deliveryCount=pool.filter(({r})=>r.delivery&&(selected==='all'||r.tier===selected)).length;
+    const deliveryChip=h('button',{id:'delivery-only',type:'button','aria-pressed':deliveryOnly,title:'只看原表明确提到外卖的条目'},['外卖',h('small',{},String(deliveryCount))]);
+    deliveryChip.onclick=()=>{deliveryOnly=!deliveryOnly;page=1;render();};
     tierBox.replaceChildren(...Object.entries(tierNames).map(([id,name])=>{
       const b=h('button',{type:'button','aria-pressed':selected===id,'data-tier':id},[name,h('small',{},String(counts[id]))]);
       b.onclick=()=>{selected=id;page=1;render();};return b;
-    }));
+    }),deliveryChip);
     if(active)tierBox.querySelector('[data-tier="'+active+'"]')?.focus({preventScroll:true});
-    visible=pool.filter(x=>selected==='all'||x.r.tier===selected).sort((a,b)=>b.score-a.score|| Number(Boolean(b.r.external.length))-Number(Boolean(a.r.external.length))).map(x=>x.r);
+    if(deliveryFocused)deliveryChip.focus({preventScroll:true});
+    visible=filtered.filter(x=>selected==='all'||x.r.tier===selected).sort((a,b)=>b.score-a.score|| Number(Boolean(b.r.external.length))-Number(Boolean(a.r.external.length))).map(x=>x.r);
     const pages=Math.max(1,Math.ceil(visible.length/limit));page=Math.min(page,pages);
     const begin=(page-1)*limit;
     const showing=visible.slice(begin,begin+limit);
@@ -200,7 +206,7 @@
     }
     paginator.replaceChildren(...nav);
     $('#surprise').disabled=!visible.some(r=>r.tier==='red'&&!r.historicalClosure);
-    $('#reset').hidden=!(paramFields.some(name=>fields[name].value)||selected!=='all');
+    $('#reset').hidden=!(paramFields.some(name=>fields[name].value)||selected!=='all'||deliveryOnly);
     refreshMotion?.cancel();
     if(!reducedMotion.matches&&grid.animate&&grid.dataset.ready) {
       refreshMotion=grid.animate([{opacity:.35},{opacity:1}],{duration:180,easing:'ease-out'});
@@ -210,7 +216,7 @@
   }
   form.addEventListener('submit',e=>e.preventDefault());
   form.addEventListener('input',()=>{page=1;render();});
-  $('#reset').onclick=()=>{form.reset();selected='all';page=1;render();fields.q.focus({preventScroll:true});};
+  $('#reset').onclick=()=>{form.reset();selected='all';deliveryOnly=false;page=1;render();fields.q.focus({preventScroll:true});};
   $('#surprise').onclick=()=>{
     let eligible=visible.filter(r=>r.tier==='red'&&!r.historicalClosure);
     if(eligible.length>1)eligible=eligible.filter(r=>r.id!==lastDraw);
