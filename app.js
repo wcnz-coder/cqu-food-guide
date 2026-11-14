@@ -10,7 +10,36 @@
   };
   const tierNames={all:'全部',red:'红榜',black:'黑榜',mixed:'争议'};
   const zones=['虎溪','A 区','B 区','C 区','老校区周边'];
-  const zoneLabels=['科学城 · 虎溪','沙坪坝 · A 校区','沙坪坝 · B 校区','沙坪坝 · C 校区','沙坪坝 · 老校区'];
+  const zoneLabels=['科学城','沙坪坝','沙坪坝','沙坪坝','沙坪坝'];
+  const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+  const runningMotion=new Map();
+  function settle(node,{duration=240,rise=7}={}){
+    runningMotion.get(node)?.cancel();
+    if(reducedMotion.matches||!node.animate)return;
+    const motion=node.animate([{opacity:.62,transform:'translateY('+rise+'px)'},{opacity:1,transform:'translateY(0)'}],
+      {duration,easing:'cubic-bezier(.22,.75,.27,1)'});
+    runningMotion.set(node,motion);
+    motion.addEventListener('finish',()=>{if(runningMotion.get(node)===motion)runningMotion.delete(node);},{once:true});
+  }
+  let sectionObserver;
+  function watchSections(){
+    sectionObserver?.disconnect();
+    if(reducedMotion.matches||!('IntersectionObserver' in window))return;
+    sectionObserver=new IntersectionObserver(entries=>{
+      for(const entry of entries){
+        if(!entry.isIntersecting)continue;
+        sectionObserver.unobserve(entry.target);
+        entry.target.dataset.revealed='';
+      }
+    },{threshold:.14});
+    for(const el of document.querySelectorAll('.areas, .routes, .picks, .download-panel')){
+      if(!el.hasAttribute('data-revealed')&&el.getBoundingClientRect().top>=innerHeight)sectionObserver.observe(el);
+    }
+  }
+  reducedMotion.addEventListener('change',()=>{
+    if(reducedMotion.matches){for(const motion of runningMotion.values())motion.cancel();runningMotion.clear();}
+    watchSections();
+  });
   const sources=new Set();
   for(const r of records)for(const s of [...r.external,...r.ratings])sources.add(s.platform);
   for(const s of context)if(!s.platform.startsWith('饿了么'))sources.add(s.platform);
@@ -23,7 +52,9 @@
     $('#blackTotal').textContent=records.filter(r=>r.tier==='black').length;
     const areaGrid=$('#area-grid');
     const areaLinks=zones.map((z,i)=>h('a',{class:'area',href:'guide.html?zone='+encodeURIComponent(z)},
-      [h('span',{},zoneLabels[i]),h('strong',{},String(coverage[i]))]));
+      [h('span',{class:'area-label'},zoneLabels[i]),h('b',{class:'area-title'},z),
+        h('span',{class:'area-tally'},[h('strong',{},String(coverage[i])),'条记录']),
+        h('span',{class:'area-arrow','aria-hidden':'true'},'↗')]));
     areaGrid.append(...areaLinks);
     const markLastArea=()=>{
       let lastArea;
@@ -40,7 +71,7 @@
   if(pickGrid) {
     const candidates=records.filter(r=>r.tier==='red'&&!r.historicalClosure&&(r.features||r.signals[0]));
     let previous=new Set();
-    const pick=()=>{
+    const pick=(animate=false)=>{
       const fresh=candidates.filter(r=>!previous.has(r.id));
       const pool=fresh.length>=3?fresh:candidates.slice();
       const chosen=[];
@@ -49,14 +80,17 @@
         chosen.push(pool.splice(i,1)[0]);
       }
       previous=new Set(chosen.map(r=>r.id));
-      pickGrid.replaceChildren(...chosen.map(r=>h('article',{class:'pick'},[
+      pickGrid.replaceChildren(...chosen.map((r,i)=>h('article',{class:'pick'},[
+        h('span',{class:'pick-kicker'},'0'+(i+1)+' / '+r.zone+' · 红榜'),
         h('strong',{},r.name),h('p',{},r.features||r.signals[0]),
         h('a',{href:'guide.html?item='+encodeURIComponent(r.id),'aria-label':'看详情：'+r.name},'看详情 →')
       ])));
+      if(animate)settle(pickGrid,{duration:290,rise:9});
     };
-    $('#repick').onclick=pick;
+    $('#repick').onclick=()=>pick(true);
     pick();
   }
+  watchSections();
   const form=$('#filters');
   if(!form) return;
   const fields=form.elements, dlg=$('#detail'), grid=$('#results');
@@ -143,12 +177,13 @@
     if(r.external.length)block.push(h('h3',{},'外部参考'),h('ul',{},r.external.map(s=>h('li',{},s.platform+' — '+s.fact))));
     block.push(h('p',{},'价格和反馈为资料快照。具体菜单、营业和配送情况以门店当日为准。'));
     $('#detail-body').replaceChildren(...block);
+    dlg.scrollTop=0;
     if(!dlg.open)dlg.showModal();
   };
   dlg.querySelector('.close').onclick=()=>dlg.close();
   dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close();});
   const card=r=>{
-    const btn=h('button',{type:'button','aria-label':'详情：'+r.name},'详情');
+    const btn=h('button',{type:'button','aria-label':'详情：'+r.name},['详情 ',h('span',{'aria-hidden':'true'},'↗')]);
     const meta=[r.zone,...(r.venue||'').split(' / '),r.floor].filter(Boolean).join(' · ');
     const traits=traitLabels(r);
     const summary=traits.slice(0,3).map(t=>h('span',{},t));
@@ -169,9 +204,15 @@
     if(page===1)u.searchParams.delete('page');else u.searchParams.set('page',page);
     if(u.href!==location.href)history.replaceState(null,'',u);
   }
-  const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
-  let refreshMotion;
-  function render(){
+  const tierButtons=Object.entries(tierNames).map(([id,name])=>{
+    const count=h('small');
+    const button=h('button',{type:'button','data-tier':id},[name,count]);
+    button.onclick=()=>{if(selected!==id||page!==1){selected=id;page=1;render('browse');}};
+    return {id,button,count};
+  });
+  $('#tiers').append(...tierButtons.map(({button})=>button));
+  let lastShowing;
+  function render(reason){
     const q=tokens(fields.q.value);
     const pool=idx.filter(({r})=>(!fields.zone.value||fields.zone.value===r.zone)&&(!fields.category.value||fields.category.value===r.category)&&(!fields.budget.value||(r.price&&r.price[1]<=Number(fields.budget.value)))&&(!fields.party.value||family(r).includes(fields.party.value))&&(!fields.evidence.value||(fields.evidence.value==='cross'?!!r.features:r.sources.some(s=>s.book===fields.evidence.value))))
       .map(({r,title,meta})=>{
@@ -182,39 +223,57 @@
     const filtered=service==='delivery'?pool.filter(({r})=>r.delivery)
       :service==='dine-in'?pool.filter(({r})=>diningVenues.has(r.venue)):pool;
     const counts=Object.fromEntries(Object.keys(tierNames).map(t=>[t,0]));counts.all=filtered.length;for(const {r} of filtered)counts[r.tier]++;
-    const tierBox=$('#tiers'), active=document.activeElement?.dataset?.tier;
-    tierBox.replaceChildren(...Object.entries(tierNames).map(([id,name])=>{
-      const b=h('button',{type:'button','aria-pressed':selected===id,'data-tier':id},[name,h('small',{},String(counts[id]))]);
-      b.onclick=()=>{selected=id;page=1;render();};return b;
-    }));
-    if(active)tierBox.querySelector('[data-tier="'+active+'"]')?.focus({preventScroll:true});
+    for(const {id,button,count} of tierButtons){
+      button.setAttribute('aria-pressed',String(selected===id));
+      count.textContent=counts[id];
+    }
     visible=filtered.filter(x=>selected==='all'||x.r.tier===selected).sort((a,b)=>b.score-a.score|| Number(Boolean(b.r.external.length))-Number(Boolean(a.r.external.length))).map(x=>x.r);
     const pages=Math.max(1,Math.ceil(visible.length/limit));page=Math.min(page,pages);
     const begin=(page-1)*limit;
     const showing=visible.slice(begin,begin+limit);
     $('#result-count').textContent=visible.length?'找到 '+visible.length+' 条 · 显示 '+(begin+1)+'–'+(begin+showing.length)+(fields.budget.value?'（隐藏未知价格）':''):'暂无匹配结果';
-    grid.replaceChildren(...(showing.length?showing.map(card):[h('p',{class:'empty'},'这组条件没有匹配。可尝试更短的菜名，或放宽校区、预算和榜单类型。')]));
+    const signature=JSON.stringify(showing.map(r=>r.id));
+    if(lastShowing!==signature){
+      grid.replaceChildren(...(showing.length?showing.map(card):[h('p',{class:'empty'},'这组条件没有匹配。可尝试更短的菜名，或放宽校区、预算和榜单类型。')]));
+      if(reason==='browse')settle(grid);
+      else if(reason==='search'){
+        runningMotion.get(grid)?.cancel();
+        runningMotion.delete(grid);
+      }
+      lastShowing=signature;
+    }
     const paginator=$('#pagination');
     const buttons=new Set([1,pages,page-2,page-1,page,page+1,page+2].filter(n=>n>=1&&n<=pages).sort((a,b)=>a-b));
     let previous=0;const nav=[];
     if(pages>1)for(const n of buttons){
       if(n-previous>1)nav.push(h('span',{'aria-hidden':'true'},'…'));
       const p=h('button',{class:'pager',type:'button','aria-current':page===n?'page':null,'aria-label':'第 '+n+' 页'},String(n));
-      p.onclick=()=>{page=n;render();$('#result-count').scrollIntoView({block:'center'});$('#pagination [aria-current=page]')?.focus({preventScroll:true});};nav.push(p);previous=n;
+      p.onclick=()=>{
+        if(page===n)return;
+        page=n;render('browse');
+        const resultsTop=$('#result-count');
+        resultsTop.focus({preventScroll:true});
+        resultsTop.scrollIntoView({block:'start',behavior:reducedMotion.matches?'instant':'smooth'});
+      };nav.push(p);previous=n;
     }
     paginator.replaceChildren(...nav);
     $('#surprise').disabled=!visible.some(r=>r.tier==='red'&&!r.historicalClosure);
     $('#reset').hidden=!(paramFields.some(name=>fields[name].value)||selected!=='all');
-    refreshMotion?.cancel();
-    if(!reducedMotion.matches&&grid.animate&&grid.dataset.ready) {
-      refreshMotion=grid.animate([{opacity:.35},{opacity:1}],{duration:180,easing:'ease-out'});
-    }
-    grid.dataset.ready='true';
     saveURL();
   }
   form.addEventListener('submit',e=>e.preventDefault());
-  form.addEventListener('input',()=>{page=1;render();});
-  $('#reset').onclick=()=>{form.reset();selected='all';page=1;render();fields.q.focus({preventScroll:true});};
+  let lastQuery=fields.q.value;
+  const updateQuery=()=>{
+    if(lastQuery===fields.q.value)return;
+    lastQuery=fields.q.value;page=1;render('search');
+  };
+  fields.q.addEventListener('compositionend',updateQuery);
+  form.addEventListener('input',event=>{
+    if(event.isComposing)return;
+    if(event.target===fields.q)updateQuery();
+    else {page=1;render('browse');}
+  });
+  $('#reset').onclick=()=>{form.reset();lastQuery=fields.q.value;selected='all';page=1;render('browse');fields.q.focus({preventScroll:true});};
   $('#surprise').onclick=()=>{
     let eligible=visible.filter(r=>r.tier==='red'&&!r.historicalClosure);
     if(eligible.length>1)eligible=eligible.filter(r=>r.id!==lastDraw);

@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#171713">
+  <meta name="theme-color" content="#f8f2e7">
   <meta name="description" content="重庆大学非官方校园美食指南。学生共创原表、校区检索和可追溯的门店参考。">
   <title>红黑榜 · 重大开饭</title>
   <link rel="icon" href="mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=editorial-1">
   <script src="data.js" defer></script>
   <script src="reviews.js" defer></script>
   <script src="ratings.js" defer></script>
-  <script src="app.js" defer></script>
+  <script src="app.js?v=editorial-1" defer></script>
 </head>
 <body data-page="guide">
 <a class="skip" href="#main">跳到正文</a>
@@ -21,8 +21,11 @@
     <a class="nav-cta" href="#guide">查榜 <span aria-hidden="true">↗</span></a>
   </header>
   <main id="main" class="frame">
-<div class="subhead"><p class="eyebrow">THE CQU DIRECTORY</p><p>校园、校门口与附近商圈</p><button id="surprise" class="outline" type="button">在当前筛选中抽一家红榜 ↝</button></div>    <section class="directory section" id="guide" aria-labelledby="guide-title">
-      <div class="section-head"><div><p class="eyebrow">02 / THE LIST</p><h2 id="guide-title">重大美食红黑榜</h2></div><p>红榜、黑榜与争议沿用学生原表标记。<br>网络评分独立展示，不改变学生分榜。</p></div>
+    <section class="directory section" id="guide" aria-labelledby="guide-title">
+      <div class="page-intro">
+        <div><p class="eyebrow">02 / THE CQU DIRECTORY</p><h1 id="guide-title">重大美食红黑榜</h1><p class="page-deck">学生原表怎么分榜，这里就怎么记。网络评分单独展示。</p></div>
+        <button id="surprise" class="outline" type="button">在当前筛选中抽一家红榜 <span aria-hidden="true">↝</span></button>
+      </div>
       <form id="filters" role="search">
         <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 4 4"/></svg><input name="q" type="search" aria-label="搜索食物、店名或校区" placeholder="搜店名、菜品或校区"><kbd>/</kbd></label>
         <label class="select"><span>校区</span><select name="zone" aria-label="校区"><option value="">全部校区</option></select></label>
@@ -35,7 +38,7 @@
         <p class="filter-note" id="service-note">堂食按原表可识别的食堂条目筛选；外卖只看原表明确标注，不代表当前可配送。</p>
       </form>
       <div class="tier-row"><span class="filter-label" aria-hidden="true">榜单</span><div class="tiers" id="tiers" role="group" aria-label="榜单类型"></div></div>
-      <div class="results-top"><output id="result-count" aria-live="polite"></output><button class="linkbtn" id="reset" hidden>清空筛选</button></div>
+      <div class="results-top"><output id="result-count" aria-live="polite" tabindex="-1"></output><button class="linkbtn" id="reset" hidden>清空筛选</button></div>
       <div id="results" class="cards"></div>
       <noscript><p class="empty">请启用 JavaScript 浏览榜单，或前往数据页查看原表。</p></noscript>
       <div id="pagination" aria-label="翻页"></div>
@@ -43,6 +46,6 @@
 
 </main>
 <footer class="frame"><strong>重大开饭</strong><span>学生资料整理 · 非重庆大学官方发布 · 数据截至 <time datetime="2026-11">2026.11</time></span><small>特别鸣谢：重大饭协、重大26级计软群、重大小天摄影干饭群</small><div class="footer-links"><a href="sources.html">数据</a><a href="downloads/source-rows.csv" download>原数据 ↓</a><a href="#">回到顶部 ↑</a></div></footer>
-  <dialog id="detail" aria-labelledby="detail-title"><div class="sheet"><button class="close" type="button" aria-label="关闭">×</button><div id="detail-body"></div></div></dialog>
+  <dialog id="detail" aria-labelledby="detail-title"><div class="sheet"><button class="close" type="button" aria-label="关闭" autofocus>×</button><div id="detail-body"></div></div></dialog>
 </body>
 </html>
