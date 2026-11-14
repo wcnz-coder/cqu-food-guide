@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#171713">
+  <meta name="description" content="重庆大学非官方校园美食指南。学生共创原表、校区检索和可追溯的门店参考。">
+  <title>重大开饭 · 重庆大学美食红黑榜</title>
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#guide">跳到榜单</a>
+  <header class="mast frame">
+    <a class="brand" href="./"><img src="mark.svg" width="38" height="38" alt=""><span><b>重大开饭</b><small>CQU FOOD INDEX</small></span></a>
+    <nav aria-label="主导航"><a href="#guide">红黑榜</a><a href="#areas">校区索引</a><a href="#sources">数据出处</a></nav>
+    <a class="nav-cta" href="#guide">查榜 <span aria-hidden="true">↗</span></a>
+  </header>
+  <main class="frame">
+    <section class="hero" aria-labelledby="title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> 重庆大学 · 非官方校园饮食指南</p>
+        <h1 id="title">重大<span class="pause">，</span><br><span class="finish">开饭<span class="bang">！</span></span></h1>
+        <p class="intro">从虎溪到沙坪坝，从食堂窗口到校门口。<br>好吃的、踩过雷的、各说各话的，都有出处。</p>
+        <div class="hero-actions"><a class="solid" href="#guide">逛红黑榜 <span aria-hidden="true">↓</span></a><button id="surprise" class="outline" disabled>帮我选一顿 <span aria-hidden="true">↝</span></button></div>
+        <span class="edition">ISSUE 01 <i></i> 2026.11 <i></i> CHONGQING, CN</span>
+      </div>
+      <figure class="hero-art">
+        <img src="noodles.jpg" width="1448" height="1086" fetchpriority="high" alt="红油面与干辣椒，重庆风味主题配图">
+        <div class="photo-top"><span>重庆大学<br>CAMPUS EATS</span><span>01<br>FIELD GUIDE</span></div>
+        <figcaption><span>这一站：山城饭点</span><small>配图为生成插图，非店铺实拍</small></figcaption>
+      </figure>
+    </section>
+    <section class="ticker" aria-label="收录概况">
+      <div><strong id="total">—</strong><span>条清洗记录</span></div>
+      <div><strong id="redTotal">—</strong><span>红榜推荐</span></div>
+      <div><strong id="blackTotal">—</strong><span>黑榜反馈</span></div>
+      <div><strong>02</strong><span>份学生原表</span></div>
+    </section>
+    <section class="areas section" id="areas">
+      <div class="section-head"><div><p class="eyebrow">01 / CAMPUS INDEX</p><h2>你在哪儿吃？</h2></div><p>按校区收录量浏览。数量代表覆盖，不是评分。</p></div>
+      <div class="area-grid" id="area-grid"></div>
+    </section>
+    <section class="directory section" id="guide" aria-labelledby="guide-title">
+      <div class="section-head"><div><p class="eyebrow">02 / THE LIST</p><h2 id="guide-title">重大美食红黑榜</h2></div><p>红榜、黑榜与争议沿用学生原表标记。<br>平台资料只补门店信息，不代替试吃评分。</p></div>
+      <form id="filters" role="search">
+        <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 4 4"/></svg><input name="q" type="search" aria-label="搜索食物、店名或校区" placeholder="试搜「雨峰」「柏树林」「民主湖 拌饭」"><kbd>/</kbd></label>
+        <label class="select"><span>校区</span><select name="zone" aria-label="校区"><option value="">全部校区</option></select></label>
+        <label class="select"><span>品类</span><select name="category" aria-label="品类"><option value="">全部品类</option></select></label>
+        <label class="select"><span>预算</span><select name="budget" aria-label="预算"><option value="">不限</option><option value="15">15 元以内</option><option value="25">25 元以内</option><option value="50">50 元以内</option></select></label>
+        <label class="select"><span>来源</span><select name="evidence" aria-label="来源"><option value="">全部来源</option><option value="cross">有平台参考</option><option value="association">饭协原表</option><option value="campus-a">A 区原表</option></select></label>
+      </form>
+      <div class="tiers" id="tiers" role="group" aria-label="榜单类型"></div>
+      <div class="results-top"><output id="result-count" aria-live="polite"></output><button class="linkbtn" id="reset">清空筛选</button></div>
+      <div id="results" class="cards"></div>
+      <noscript><p class="empty">请启用 JavaScript 浏览榜单，或直接打开下方两份学生原表。</p></noscript>
+      <div id="pagination" aria-label="翻页"></div>
+    </section>
+    <section class="method section" id="sources" aria-labelledby="method-title">
+      <div class="section-head"><div><p class="eyebrow">03 / SOURCE NOTES</p><h2 id="method-title">这份榜怎么来的</h2></div><p>有评价，也有证据边界。</p></div>
+      <div class="method-grid">
+        <article><span>01 / 原表</span><h3>不把意见变成分数</h3><p>按原表榜区、明确标记及底色还原分榜。标为争议或合并后标记相冲突的保留在争议榜，来源不足的单列。相似店名不同校区不合并。</p><ul><li><a href="https://www.kdocs.cn/l/chyey0G2RNBR">重大饭协红黑榜 ↗</a></li><li><a href="https://www.kdocs.cn/l/cdGbIddi9s0b">重庆大学 A 区食堂红黑榜 ↗</a></li></ul></article>
+        <article><span>02 / 补充</span><h3>门店有出处，评分不混用</h3><p>外部资料按条标注。只收录公开可核对的信息，不展示动态配送、实时价格或平台星级。饿了么的同店数据未能公开核验，未纳入。</p><ul id="source-links"></ul></article>
+        <article><span>03 / 清洗</span><h3>去重复，保留不确定</h3><p>剔除模板、空白和明显越界条目；归一化楼层和价格区间。仅提取学生反馈的口味、分量等摘要标签，不转载投稿人信息。旧价和营业线索不代表现状。</p><a href="https://github.com/wcnz-coder/cqu-food-guide">查看代码与处理脚本 ↗</a></article>
+      </div>
+    </section>
+  </main>
+  <footer class="frame"><strong>重大开饭</strong><span>学生资料整理 · 非重庆大学官方发布</span><a href="#">回到顶部 ↑</a></footer>
+  <dialog id="detail" aria-labelledby="detail-title"><div class="sheet"><button class="close" type="button" aria-label="关闭">×</button><div id="detail-body"></div></div></dialog>
+</body>
+</html>
