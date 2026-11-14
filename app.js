@@ -12,11 +12,10 @@
   const zones=['虎溪','A 区','B 区','C 区','老校区周边'];
   const zoneLabels=['科学城 · 虎溪','沙坪坝 · A 校区','沙坪坝 · B 校区','沙坪坝 · C 校区','沙坪坝 · 老校区'];
   const isDelivery=document.body.dataset.page==='delivery';
-  const ext=(label,url)=>h('a',{href:url,target:'_blank',rel:'noopener noreferrer'},label+' ↗');
-  const sources=new Map();
-  for(const r of records)for(const s of [...r.external,...r.ratings])if(!sources.has(s.platform))sources.set(s.platform,s);
-  for(const s of context)if(!s.platform.startsWith('饿了么'))sources.set(s.platform,s);
-  $('#source-links')?.append(...[...sources.values()].map(s=>h('li',{},ext(s.platform,s.url))));
+  const sources=new Set();
+  for(const r of records)for(const s of [...r.external,...r.ratings])sources.add(s.platform);
+  for(const s of context)if(!s.platform.startsWith('饿了么'))sources.add(s.platform);
+  $('#source-names')?.append(...[...sources].map(name=>h('li',{},name)));
   const coverage=zones.map(z=>records.filter(r=>r.zone===z).length);
   const areaKey='cqu-last-campus';
   if($('#total')){
@@ -127,12 +126,12 @@
     if(r.features)block.push(h('h3',{},'门店特点'),h('p',{},r.features));
     if(r.features||score) {
       const rating=[h('h3',{},'网络评分'),h('p',{},score?h('strong',{},rated(score)):'未查到可核实的同店公开评分')];
-      if(score)rating.push(h('ul',{},score.rows.map(s=>h('li',{},[ext(s.platform,s.url),': '+s.score+' / '+s.max+' · '+(s.count==null?'评论数未知':s.count+' 条')+' · 核对 '+s.checked+' · 样例测评 '+(s.reviewDate||'网页未显示日期')]))));
+      if(score)rating.push(h('ul',{},score.rows.map(s=>h('li',{},s.platform+': '+s.score+' / '+s.max+' · '+(s.count==null?'评论数未知':s.count+' 条')+' · 核对 '+s.checked+' · 样例测评 '+(s.reviewDate||'网页未显示日期')))));
       block.push(h('div',{class:'platform-card'},rating));
     }
     if(traitLabels(r).length)block.push(h('div',{class:'traits'},traitLabels(r).map(t=>h('span',{},t))));
-    if(r.sources.length)block.push(h('h3',{},'学生原表'),h('ul',{},r.sources.map(s=>h('li',{},[ext(books[s.book].name,books[s.book].url),' · '+s.sheet+' · '+s.cell+' · 原标记：'+tierNames[s.mark]]))));
-    if(r.external.length)block.push(h('h3',{},'外部参考'),h('ul',{},r.external.map(s=>h('li',{},[ext(s.platform,s.url),' — '+s.fact]))));
+    if(r.sources.length)block.push(h('h3',{},'学生原表'),h('ul',{},r.sources.map(s=>h('li',{},books[s.book].name+' · '+s.sheet+' · '+s.cell+' · 原标记：'+tierNames[s.mark]))));
+    if(r.external.length)block.push(h('h3',{},'外部参考'),h('ul',{},r.external.map(s=>h('li',{},s.platform+' — '+s.fact))));
     block.push(h('p',{},'价格和反馈为资料快照。具体菜单、营业和配送情况以门店当日为准。'));
     $('#detail-body').replaceChildren(...block);
     if(!dlg.open)dlg.showModal();
