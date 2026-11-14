@@ -307,7 +307,7 @@ body[data-page=guide] .mast nav a[aria-current=page],
 body[data-page=guide] .nav-cta,
 .directory #surprise { border-color: var(--blue-line); color: var(--blue-dark) }
 .directory .eyebrow, .directory .card-foot button { color: var(--blue-dark) }
-.directory #filters { background: var(--blue-sheet); border-color: var(--blue-line) }
+.directory #filters { background: var(--blue-light); border-color: var(--blue-line) }
 .directory :is(.search,.select,.search kbd,.tiers button,.pager,.linkbtn) { border-color: var(--blue-line) }
 .directory :is(.search,.select):focus-within { outline-color: var(--blue) }
 .directory .search svg { stroke: var(--blue) }
@@ -315,7 +315,7 @@ body[data-page=guide] .nav-cta,
   background: var(--blue); border-color: var(--blue); color: #fff;
 }
 .directory .card:has(.pill.red) {
-  background: var(--blue-sheet); border-color: var(--blue-line); box-shadow: 0 3px 0 #dde6f4;
+  background: var(--blue-light); border-color: var(--blue-line); box-shadow: 0 3px 0 #dde6f4;
 }
 body[data-page=guide] .pill.red {
   display: inline-flex; align-items: center; gap: 5px;
