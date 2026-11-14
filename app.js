@@ -97,6 +97,12 @@
   const paramFields=['q','zone','category','budget','evidence','party','service'];
   const limit=18, params=new URLSearchParams(location.search);
   const diningVenues=new Set(['校内食堂','一食堂','柏树林','民主湖','东林食堂']);
+  // Campus shortcuts use named places, not the typo-tolerant public search.
+  const campusSpots=new Map([
+    ['huxi-first',{zone:'虎溪',label:'虎溪一食堂',matches:r=>r.venue==='一食堂'||/一食堂|第一学生食堂/.test(r.name)}],
+    ['a-lake',{zone:'A 区',label:'A 区民主湖',matches:r=>r.venue==='民主湖'||r.name.includes('民主湖')}]
+  ]);
+  let spot=params.get('spot');
   if(zones.includes(params.get('zone'))) {
     try{sessionStorage.setItem(areaKey,params.get('zone'));}catch{}
   }
@@ -136,6 +142,7 @@
     if(fields[name].tagName==='SELECT'&&fields[name].selectedIndex<0)fields[name].selectedIndex=0;
   }
   if(!params.has('service')&&params.get('delivery')==='1')fields.service.value='delivery';
+  if(!campusSpots.has(spot)||campusSpots.get(spot).zone!==fields.zone.value)spot=null;
   fields.q.maxLength=100;
   const family=r=>{
     if(r.historicalClosure) return [];
@@ -200,6 +207,7 @@
       if(fields[name].value.trim())u.searchParams.set(name,fields[name].value.trim());else u.searchParams.delete(name);
     }
     if(selected==='all')u.searchParams.delete('tier');else u.searchParams.set('tier',selected);
+    if(spot)u.searchParams.set('spot',spot);else u.searchParams.delete('spot');
     u.searchParams.delete('delivery');
     if(page===1)u.searchParams.delete('page');else u.searchParams.set('page',page);
     if(u.href!==location.href)history.replaceState(null,'',u);
@@ -212,9 +220,16 @@
   });
   $('#tiers').append(...tierButtons.map(({button})=>button));
   let lastShowing;
+  const clearSpot=$('#clear-spot');
   function render(reason){
     const q=tokens(fields.q.value);
-    const pool=idx.filter(({r})=>(!fields.zone.value||fields.zone.value===r.zone)&&(!fields.category.value||fields.category.value===r.category)&&(!fields.budget.value||(r.price&&r.price[1]<=Number(fields.budget.value)))&&(!fields.party.value||family(r).includes(fields.party.value))&&(!fields.evidence.value||(fields.evidence.value==='cross'?!!r.features:r.sources.some(s=>s.book===fields.evidence.value))))
+    const place=campusSpots.get(spot);
+    clearSpot.hidden=!place;
+    if(place){
+      clearSpot.textContent='地点：'+place.label+' ×';
+      clearSpot.setAttribute('aria-label','移除地点筛选：'+place.label);
+    }
+    const pool=idx.filter(({r})=>(!fields.zone.value||fields.zone.value===r.zone)&&(!place||place.matches(r))&&(!fields.category.value||fields.category.value===r.category)&&(!fields.budget.value||(r.price&&r.price[1]<=Number(fields.budget.value)))&&(!fields.party.value||family(r).includes(fields.party.value))&&(!fields.evidence.value||(fields.evidence.value==='cross'?!!r.features:r.sources.some(s=>s.book===fields.evidence.value))))
       .map(({r,title,meta})=>{
         const scores=q.map(t=>Math.max(0,...title.map(s=>match(t,s)*3),...meta.map(s=>s.includes(t)?12:0)));
         return {r,score:scores.every(Boolean)?scores.reduce((a,b)=>a+b,0):-1};
@@ -258,7 +273,7 @@
     }
     paginator.replaceChildren(...nav);
     $('#surprise').disabled=!visible.some(r=>r.tier==='red'&&!r.historicalClosure);
-    $('#reset').hidden=!(paramFields.some(name=>fields[name].value)||selected!=='all');
+    $('#reset').hidden=!(spot||paramFields.some(name=>fields[name].value)||selected!=='all');
     saveURL();
   }
   form.addEventListener('submit',e=>e.preventDefault());
@@ -271,9 +286,13 @@
   form.addEventListener('input',event=>{
     if(event.isComposing)return;
     if(event.target===fields.q)updateQuery();
-    else {page=1;render('browse');}
+    else {
+      if(event.target===fields.zone&&fields.zone.value!==campusSpots.get(spot)?.zone)spot=null;
+      page=1;render('browse');
+    }
   });
-  $('#reset').onclick=()=>{form.reset();lastQuery=fields.q.value;selected='all';page=1;render('browse');fields.q.focus({preventScroll:true});};
+  clearSpot.onclick=()=>{spot=null;page=1;render('browse');fields.q.focus({preventScroll:true});};
+  $('#reset').onclick=()=>{form.reset();spot=null;lastQuery=fields.q.value;selected='all';page=1;render('browse');fields.q.focus({preventScroll:true});};
   $('#surprise').onclick=()=>{
     let eligible=visible.filter(r=>r.tier==='red'&&!r.historicalClosure);
     if(eligible.length>1)eligible=eligible.filter(r=>r.id!==lastDraw);

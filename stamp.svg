@@ -9,7 +9,7 @@
     <path stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" d="M42 62h36c-3 9-8 15-18 15S45 71 42 62Zm10 19h16m-6-22 16-17m-10 16 13-12M49 55c-2-3 4-5 2-10m6 10c-2-3 4-5 2-10"/>
   </g>
   <g fill="#9d3325" font-family="Arial,sans-serif" text-anchor="middle" font-weight="700" font-size="9.2" letter-spacing="1.35">
-    <text><textPath href="#top" startOffset="50%">CAMPUS EATS</textPath></text>
-    <text><textPath href="#bottom" startOffset="50%">· CHONGQING ·</textPath></text>
+    <text><textPath href="#top" startOffset="50%">CQU FOOD NOTES</textPath></text>
+    <text><textPath href="#bottom" startOffset="50%">· HUXI / CQU ·</textPath></text>
   </g>
 </svg>

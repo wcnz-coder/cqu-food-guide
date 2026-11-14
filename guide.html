@@ -7,11 +7,11 @@
   <meta name="description" content="重庆大学非官方校园美食指南。学生共创原表、校区检索和可追溯的门店参考。">
   <title>红黑榜 · 重大开饭</title>
   <link rel="icon" href="mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=editorial-1">
+  <link rel="stylesheet" href="style.css?v=campus-notes-1">
   <script src="data.js" defer></script>
   <script src="reviews.js" defer></script>
   <script src="ratings.js" defer></script>
-  <script src="app.js?v=editorial-1" defer></script>
+  <script src="app.js?v=campus-notes-1" defer></script>
 </head>
 <body data-page="guide">
 <a class="skip" href="#main">跳到正文</a>
@@ -36,6 +36,7 @@
         <label class="select"><span>用餐方式</span><select name="service" aria-label="用餐方式" aria-describedby="service-note"><option value="">不限</option><option value="dine-in">堂食</option><option value="delivery">外卖</option></select></label>
         <p class="filter-note" id="party-note">人数依据餐型与已知场景筛选，不代表有空桌、能拼桌或能包场。</p>
         <p class="filter-note" id="service-note">堂食按原表可识别的食堂条目筛选；外卖只看原表明确标注，不代表当前可配送。</p>
+        <button type="button" class="linkbtn spot-filter" id="clear-spot" hidden></button>
       </form>
       <div class="tier-row"><span class="filter-label" aria-hidden="true">榜单</span><div class="tiers" id="tiers" role="group" aria-label="榜单类型"></div></div>
       <div class="results-top"><output id="result-count" aria-live="polite" tabindex="-1"></output><button class="linkbtn" id="reset" hidden>清空筛选</button></div>
