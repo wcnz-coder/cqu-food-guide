@@ -10,7 +10,7 @@
   };
   const tierNames={all:'全部',red:'红榜',black:'黑榜',mixed:'争议',unknown:'未分榜'};
   const zones=['虎溪','A 区','B 区','C 区','老校区周边'];
-  const zoneLabels=['科学城 · 虎溪','沙坪坝 · A 校区','沙坪坝 · B 校区','沙坪坝 · C 校区','沙坪坝 · 未细分'];
+  const zoneLabels=['科学城 · 虎溪','沙坪坝 · A 校区','沙坪坝 · B 校区','沙坪坝 · C 校区','沙坪坝 · 老校区'];
   const isDelivery=document.body.dataset.page==='delivery';
   const ext=(label,url)=>h('a',{href:url,target:'_blank',rel:'noopener noreferrer'},label+' ↗');
   const sources=new Map();
@@ -22,7 +22,21 @@
     $('#total').textContent=records.length;
     $('#redTotal').textContent=records.filter(r=>r.tier==='red').length;
     $('#blackTotal').textContent=records.filter(r=>r.tier==='black').length;
-    zones.forEach((z,i)=>$('#area-grid').append(h('a',{class:'area',href:'guide.html?zone='+encodeURIComponent(z)},[h('span',{},zoneLabels[i]),h('strong',{},String(coverage[i]))])));
+    const areaGrid=$('#area-grid');
+    const areaKey='cqu-last-campus';
+    let lastArea;
+    try{lastArea=sessionStorage.getItem(areaKey);}catch{}
+    const areaLinks=zones.map((z,i)=>{
+      const link=h('a',{class:'area',href:'guide.html?zone='+encodeURIComponent(z),'aria-current':z===lastArea?'true':null},
+        [h('span',{},zoneLabels[i]),h('strong',{},String(coverage[i]))]);
+      link.addEventListener('click',()=>{
+        areaGrid.querySelector('[aria-current]')?.removeAttribute('aria-current');
+        link.setAttribute('aria-current','true');
+        try{sessionStorage.setItem(areaKey,z);}catch{}
+      });
+      return link;
+    });
+    areaGrid.append(...areaLinks);
   }
   const form=$('#filters');
   if(!form) return;
@@ -76,7 +90,7 @@
     return [solo?'one':'',two?'two':'',shared?'few':'',many?'many':''].filter(Boolean);
   };
   const traitLabels=r=>[...(r.historicalClosure?['原表提到停业 · 待核实']:[]),...r.signals];
-  const money=r=>r.price ? '原表 ¥'+r.price[0]+(r.price[0]===r.price[1]?'':'–'+r.price[1]) : '价格未收录';
+  const money=r=>r.price ? '¥'+r.price[0]+(r.price[0]===r.price[1]?'':'–'+r.price[1]) : '';
   const pill=r=>h('span',{class:'pill '+r.tier},tierNames[r.tier]);
   const rate=r=>globalThis.aggregateRatings(r.ratings);
   const rated=x=>x.score.toFixed(2)+' / 5'+(x.rows.length>1?' · 加权':' · 单源');
@@ -99,13 +113,17 @@
   dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close();});
   const card=r=>{
     const sourceLabel=(r.sources.length?r.sources.length+' 条原表':'平台补充')+(r.delivery?' · 外卖线索':r.features&&r.sources.length?' · 有交叉出处':'');
-    const btn=h('button',{type:'button','aria-label':'查看出处：'+r.name},'查看出处 ↗');
+    const btn=h('button',{type:'button','aria-label':'详情：'+r.name},'详情');
     const score=rate(r);
+    const meta=[r.zone,...(r.venue||'').split(' / '),r.floor].filter(Boolean).join(' · ');
+    const traits=traitLabels(r);
+    const summary=traits.slice(0,3).map(t=>h('span',{},t));
+    if(traits.length>3)summary.push(h('span',{'aria-label':'另有 '+(traits.length-3)+' 个特点'},'+'+(traits.length-3)));
     btn.onclick=()=>details(r);
-    return h('article',{class:'card'},[h('div',{class:'card-meta'},[pill(r),[r.zone,r.venue,r.floor].filter(Boolean).join(' · ')]),
+    return h('article',{class:'card'},[h('div',{class:'card-meta'},[pill(r),meta]),
       h('h3',{},r.name),h('p',{class:'dish'},[r.dish,r.category,money(r)].filter(Boolean).join(' · ')),
       ...(r.features?[h('div',{class:'platform-card'},[h('strong',{},score?'网评分 '+rated(score):'网评未核实'),h('p',{},r.features)])]:[]),
-      h('div',{class:'traits'},traitLabels(r).slice(0,4).map(t=>h('span',{},t))),
+      ...(summary.length?[h('div',{class:'traits'},summary)]:[]),
       h('p',{class:'freshness'},freshness(r)),
       h('div',{class:'card-foot'},[h('span',{},sourceLabel),btn])]);
   };
@@ -118,6 +136,8 @@
     if(page===1)u.searchParams.delete('page');else u.searchParams.set('page',page);
     if(u.href!==location.href)history.replaceState(null,'',u);
   }
+  const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+  let refreshMotion;
   function render(){
     const q=tokens(fields.q.value);
     const pool=idx.filter(({r})=>(!fields.zone.value||fields.zone.value===r.zone)&&(!fields.category.value||fields.category.value===r.category)&&(!fields.budget.value||(r.price&&r.price[1]<=Number(fields.budget.value)))&&(!fields.party.value||family(r).includes(fields.party.value))&&(!fields.evidence.value||(fields.evidence.value==='cross'?!!r.features:r.sources.some(s=>s.book===fields.evidence.value))))
@@ -148,6 +168,12 @@
     }
     paginator.replaceChildren(...nav);
     $('#surprise').disabled=!visible.some(r=>r.tier==='red'&&!r.historicalClosure);
+    $('#reset').hidden=!(paramFields.some(name=>fields[name].value)||selected!=='all');
+    refreshMotion?.cancel();
+    if(!reducedMotion.matches&&grid.animate&&grid.dataset.ready) {
+      refreshMotion=grid.animate([{opacity:.35},{opacity:1}],{duration:180,easing:'ease-out'});
+    }
+    grid.dataset.ready='true';
     saveURL();
   }
   form.addEventListener('submit',e=>e.preventDefault());
