@@ -201,6 +201,7 @@ body[data-page=delivery] .directory{margin-top:25px}
 .download-panel{margin:25px 0 45px;background:var(--paper-hover);padding:24px;display:flex;justify-content:space-between;align-items:center;gap:var(--space-grid);flex-wrap:wrap}
 .download-panel h2{font:var(--w-ui) var(--fs-h3) var(--ui);margin:4px 0 7px}
 .download-panel p:not(.eyebrow){font-size:var(--fs-sm);color:var(--t3)}
+.download-actions{display:flex;flex-wrap:wrap;gap:8px}
 footer small{font-size:var(--fs-mini)}
 footer a{color:var(--t2);text-decoration:underline}
 #main{scroll-margin-top:96px}
