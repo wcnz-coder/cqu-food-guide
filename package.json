@@ -1,0 +1,11 @@
+{
+  "name": "cqu-food-guide",
+  "private": true,
+  "scripts": {
+    "test": "node test-data.cjs && node test-ui.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "31.0.1"
+  },
+  "version": "1.0.0"
+}

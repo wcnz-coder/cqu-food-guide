@@ -9,10 +9,10 @@
   <link rel="icon" href="mark.svg" type="image/svg+xml">
   <link rel="preload" as="image" href="cqu-avatar-mealtime.png" fetchpriority="high">
   <link rel="preload" as="font" href="fonts/editorial-sc.woff2" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css?v=sticker-1">
+  <link rel="stylesheet" href="style.css?v=decision-2">
   <script src="data.js" defer></script>
   <script src="ratings.js" defer></script>
-  <script src="app.js?v=campus-notes-1" defer></script>
+  <script src="app.js?v=decision-2" defer></script>
 </head>
 <body data-page="home">
 <a class="skip" href="#main">跳到正文</a>
@@ -27,6 +27,13 @@
         <p class="eyebrow hero-kicker"><span></span> 重庆大学 · 非官方校园饮食指南</p>
         <h1 id="title"><span>重大<span class="comma">，</span></span><span class="title-accent">开饭<span class="bang">！</span></span></h1>
         <p class="intro">从虎溪到沙坪坝，食堂窗口到校门口。<br>吃过的、踩过的、各说各话的，都记在这儿。</p>
+        <form id="quick-search" class="quick-search" action="guide.html" method="get" role="search" aria-label="快捷找吃的">
+          <label>想吃什么<input type="search" name="q" placeholder="搜店名、菜品" maxlength="100"></label>
+          <label>校区<select name="zone"><option value="">全部校区</option><option>虎溪</option><option>A 区</option><option>B 区</option><option>C 区</option><option>老校区周边</option></select></label>
+          <label>预算<select name="budget"><option value="">不限</option><option value="15">15 元以内</option><option value="25">25 元以内</option><option value="50">50 元以内</option></select></label>
+          <button class="solid" type="submit">找吃的 →</button>
+          <small>预算筛选隐藏未知价格；下方随机推荐跟随校区与预算。</small>
+        </form>
         <div class="hero-actions"><a class="solid" href="guide.html">逛红黑榜 <span aria-hidden="true">↗</span></a></div>
         <span class="edition">VOL. 01 <i></i> 2026.11 <i></i> CHONGQING, CN</span>
       </div>
@@ -44,6 +51,7 @@
       <div><strong id="total">—</strong><span><small>THE INDEX</small>条收录记录</span></div>
       <div><strong id="redTotal">—</strong><span><small>THE RED LIST</small>红榜推荐</span></div>
       <div><strong id="blackTotal">—</strong><span><small>THE BLACK LIST</small>黑榜反馈</span></div>
+      <div><strong id="mixedTotal">—</strong><span><small>MIXED FEEDBACK</small>争议记录</span></div>
       <div><strong>2</strong><span><small>THE SOURCES</small>份学生原表</span></div>
     </section>
     <section class="areas section" id="areas">
@@ -53,7 +61,7 @@
     <section class="section routes" aria-labelledby="routes-title">
       <div class="section-head"><div><p class="eyebrow" lang="en">02 / WHAT'S FOR DINNER</p><h2 id="routes-title">这顿怎么吃？ <svg class="doodle title-doodle" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#bowl"/></svg></h2></div><p>按你今天的饭局筛选红黑榜。</p></div>
       <div class="route-grid">
-        <a href="guide.html?party=two"><span>01 / DATE NIGHT</span><strong>两个人慢慢吃</strong><small>双人约会 · 找适合坐下来聊的地方</small><b aria-hidden="true">↗</b><svg class="doodle route-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#heart"/></svg></a>
+        <a href="guide.html?party=two"><span>01 / TABLE FOR TWO</span><strong>两个人慢慢吃</strong><small>双人用餐 · 按餐型推测，环境待核实</small><b aria-hidden="true">↗</b><svg class="doodle route-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#heart"/></svg></a>
         <a href="guide.html?party=many"><span>02 / SHARING TABLE</span><strong>约一桌朋友</strong><small>六人以上 · 从适合分食的餐型找</small><b aria-hidden="true">↗</b><svg class="doodle route-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#bowl"/></svg></a>
         <a href="guide.html?service=delivery"><span>03 / DELIVERY</span><strong>今天不出门</strong><small>在红黑榜筛选原表标明的外卖线索</small><b aria-hidden="true">↗</b><svg class="doodle route-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#bag"/></svg></a>
       </div>
@@ -61,9 +69,10 @@
 
     <section class="section picks" aria-labelledby="picks-title">
       <div class="section-head"><div><p class="eyebrow" lang="en">03 / TODAY'S PICK</p><h2 id="picks-title">今天吃这个 <svg class="doodle title-doodle" viewBox="0 0 72 72" aria-hidden="true"><use href="doodles.svg#star"/></svg></h2></div><button id="repick" class="linkbtn" type="button" aria-controls="pick-grid">换一批</button></div>
+      <p id="pick-note" class="filter-note" aria-live="polite"></p>
       <div class="pick-grid" id="pick-grid" aria-live="polite"></div>
     </section>
 </main>
-<footer class="frame"><strong>重大开饭</strong><span>学生资料整理 · 非重庆大学官方发布 · 数据截至 <time datetime="2026-11">2026.11</time></span><small>特别鸣谢：重大饭协、重大26级计软群、重大小天摄影干饭群</small><div class="footer-links"><a href="sources.html">数据</a><a href="downloads/source-rows.csv" download>原数据 ↓</a><a href="#">回到顶部 ↑</a></div></footer>
+<footer class="frame"><strong>重大开饭</strong><span>学生资料整理 · 非重庆大学官方发布 · 数据截至 <time datetime="2026-11">2026.11</time></span><small>特别鸣谢：重大饭协、重大26级计软群、重大小天摄影干饭群</small><div class="footer-links"><a href="sources.html">数据</a><a href="feedback.html">报错 / 补充</a><a href="downloads/source-rows.csv" download>原数据 ↓</a><a href="#">回到顶部 ↑</a></div></footer>
 </body>
 </html>

@@ -7,11 +7,11 @@
   <meta name="description" content="重庆大学非官方校园美食指南。学生共创原表、校区检索和可追溯的门店参考。">
   <title>红黑榜 · 重大开饭</title>
   <link rel="icon" href="mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=guide-blue-2">
+  <link rel="stylesheet" href="style.css?v=decision-2">
   <script src="data.js" defer></script>
   <script src="reviews.js" defer></script>
   <script src="ratings.js" defer></script>
-  <script src="app.js?v=campus-notes-1" defer></script>
+  <script src="app.js?v=decision-2" defer></script>
 </head>
 <body data-page="guide">
 <a class="skip" href="#main">跳到正文</a>
@@ -33,10 +33,10 @@
         <label class="select"><span>品类</span><select name="category" aria-label="品类"><option value="">全部品类</option></select></label>
         <label class="select"><span>预算</span><select name="budget" aria-label="预算"><option value="">不限</option><option value="15">15 元以内</option><option value="25">25 元以内</option><option value="50">50 元以内</option></select></label>
         <label class="select"><span>来源</span><select name="evidence" aria-label="来源"><option value="">全部来源</option><option value="cross">有平台参考</option><option value="association">饭协原表</option><option value="campus-a">A 区原表</option></select></label>
-        <label class="select"><span>人数</span><select name="party" aria-label="用餐人数" aria-describedby="party-note"><option value="">不限</option><option value="one">1 人 · 独食</option><option value="two">2 人 · 约会</option><option value="few">3–5 人 · 小聚</option><option value="many">6 人以上 · 聚餐</option></select></label>
-        <label class="select"><span>用餐方式</span><select name="service" aria-label="用餐方式" aria-describedby="service-note"><option value="">不限</option><option value="dine-in">堂食</option><option value="delivery">外卖</option></select></label>
-        <p class="filter-note" id="party-note">人数依据餐型与已知场景筛选，不代表有空桌、能拼桌或能包场。</p>
-        <p class="filter-note" id="service-note">堂食按原表可识别的食堂条目筛选；外卖只看原表明确标注，不代表当前可配送。</p>
+        <label class="select"><span>人数</span><select name="party" aria-label="用餐人数" aria-describedby="party-note"><option value="">不限</option><option value="one">1 人 · 独食</option><option value="two">2 人 · 餐型参考</option><option value="few">3–5 人 · 小聚</option><option value="many">6 人以上 · 聚餐</option></select></label>
+        <label class="select"><span>用餐方式</span><select name="service" aria-label="用餐方式" aria-describedby="service-note"><option value="">不限</option><option value="dine-in">校内食堂</option><option value="delivery">外卖</option></select></label>
+        <p class="filter-note" id="party-note">人数按餐型推测，不代表已核实约会环境、座位数、空桌或包场条件。</p>
+        <p class="filter-note" id="service-note">校内食堂按原表可识别的食堂条目筛选，不包含所有校外堂食门店；外卖只看原表明确标注，不代表当前可配送。</p>
         <button type="button" class="linkbtn spot-filter" id="clear-spot" hidden></button>
       </form>
       <div class="tier-row"><span class="filter-label" aria-hidden="true">榜单</span><div class="tiers" id="tiers" role="group" aria-label="榜单类型"></div></div>
@@ -47,7 +47,7 @@
     </section>
 
 </main>
-<footer class="frame"><strong>重大开饭</strong><span>学生资料整理 · 非重庆大学官方发布 · 数据截至 <time datetime="2026-11">2026.11</time></span><small>特别鸣谢：重大饭协、重大26级计软群、重大小天摄影干饭群</small><div class="footer-links"><a href="sources.html">数据</a><a href="downloads/source-rows.csv" download>原数据 ↓</a><a href="#">回到顶部 ↑</a></div></footer>
+<footer class="frame"><strong>重大开饭</strong><span>学生资料整理 · 非重庆大学官方发布 · 数据截至 <time datetime="2026-11">2026.11</time></span><small>特别鸣谢：重大饭协、重大26级计软群、重大小天摄影干饭群</small><div class="footer-links"><a href="sources.html">数据</a><a href="feedback.html">报错 / 补充</a><a href="downloads/source-rows.csv" download>原数据 ↓</a><a href="#">回到顶部 ↑</a></div></footer>
   <dialog id="detail" aria-labelledby="detail-title"><div class="sheet"><button class="close" type="button" aria-label="关闭" autofocus>×</button><div id="detail-body"></div></div></dialog>
 </body>
 </html>

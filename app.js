@@ -8,6 +8,18 @@
     e.append(...(Array.isArray(children)?children:[children]));
     return e;
   };
+  // Preserve source labels; summarize conflicting dimensions only in the UI.
+  const summarizeSignals=r=>{
+    let labels=[...r.signals];
+    for(const [a,b,summary] of [
+      ['价格实惠','价格偏高','价格评价分歧'],
+      ['口味反馈偏正面','口味反馈偏负面','口味评价不一']
+    ]) if(labels.includes(a)&&labels.includes(b)) {
+      const position=Math.min(labels.indexOf(a),labels.indexOf(b));
+      labels=labels.filter(label=>label!==a&&label!==b);labels.splice(position,0,summary);
+    }
+    return labels;
+  };
   const tierNames={all:'全部',red:'红榜',black:'黑榜',mixed:'争议'};
   const zones=['虎溪','A 区','B 区','C 区','老校区周边'];
   const zoneLabels=['科学城','沙坪坝','沙坪坝','沙坪坝','沙坪坝'];
@@ -50,6 +62,7 @@
     $('#total').textContent=records.length;
     $('#redTotal').textContent=records.filter(r=>r.tier==='red').length;
     $('#blackTotal').textContent=records.filter(r=>r.tier==='black').length;
+    $('#mixedTotal').textContent=records.filter(r=>r.tier==='mixed').length;
     const areaGrid=$('#area-grid');
     const areaLinks=zones.map((z,i)=>h('a',{class:'area',href:'guide.html?zone='+encodeURIComponent(z)},
       [h('span',{class:'area-label'},zoneLabels[i]),h('b',{class:'area-title'},z),
@@ -69,11 +82,16 @@
   }
   const pickGrid=$('#pick-grid');
   if(pickGrid) {
-    const candidates=records.filter(r=>r.tier==='red'&&!r.historicalClosure&&(r.features||r.signals[0]));
+    const quick=$('#quick-search');
+    try { const last=sessionStorage.getItem(areaKey);if(zones.includes(last))quick.elements.zone.value=last; } catch {}
+    const candidates=()=>records.filter(r=>r.tier==='red'&&!r.historicalClosure
+      &&(!quick.elements.zone.value||r.zone===quick.elements.zone.value)
+      &&(!quick.elements.budget.value||(r.price&&r.price[1]<=Number(quick.elements.budget.value))));
     let previous=new Set();
     const pick=(animate=false)=>{
-      const fresh=candidates.filter(r=>!previous.has(r.id));
-      const pool=fresh.length>=3?fresh:candidates.slice();
+      const eligible=candidates();
+      const fresh=eligible.filter(r=>!previous.has(r.id));
+      const pool=fresh.length>=3?fresh:eligible.slice();
       const chosen=[];
       while(chosen.length<3&&pool.length) {
         const i=Math.floor(Math.random()*pool.length);
@@ -82,11 +100,17 @@
       previous=new Set(chosen.map(r=>r.id));
       pickGrid.replaceChildren(...chosen.map((r,i)=>h('article',{class:'pick'},[
         h('span',{class:'pick-kicker'},'0'+(i+1)+' / '+r.zone+' · 红榜'),
-        h('strong',{},r.name),h('p',{},r.features||r.signals[0]),
+        h('strong',{},r.name),h('p',{},r.features||summarizeSignals(r).join(' · ')||'查看原表评价'),
         h('a',{href:'guide.html?item='+encodeURIComponent(r.id),'aria-label':'看详情：'+r.name},'看详情 →')
       ])));
+      if(!chosen.length)pickGrid.append(h('p',{class:'empty'},'当前校区和预算下暂无可抽选的红榜。请放宽预算或更换校区；未知价格不会按低价处理。'));
+      $('#pick-note').textContent=(quick.elements.zone.value||'全部校区')+' · '+(quick.elements.budget.value?quick.elements.budget.value+' 元以内（隐藏未知价格）':'预算不限')+' · 排除原表提到停业的条目；营业现况待核实';
       if(animate)settle(pickGrid,{duration:290,rise:9});
     };
+    quick.addEventListener('change',()=>{
+      try{sessionStorage.setItem(areaKey,quick.elements.zone.value);}catch{}
+      previous.clear();pick(true);
+    });
     $('#repick').onclick=()=>pick(true);
     pick();
   }
@@ -153,7 +177,7 @@
     const many=shared&&!r.delivery&&!r.venue.includes('食堂');
     return [solo?'one':'',two?'two':'',shared?'few':'',many?'many':''].filter(Boolean);
   };
-  const traitLabels=r=>[...(r.historicalClosure?['原表提到停业 · 待核实']:[]),...r.signals];
+  const traitLabels=r=>[...(r.historicalClosure?['原表提到停业 · 待核实']:[]),...summarizeSignals(r)];
   const money=r=>r.price ? '¥'+r.price[0]+(r.price[0]===r.price[1]?'':'–'+r.price[1]) : '';
   const pill=r=>h('span',{class:'pill '+r.tier},tierNames[r.tier]);
   const rate=r=>globalThis.aggregateRatings(r.ratings);
@@ -165,6 +189,14 @@
     const block=[pill(r),h('h2',{id:'detail-title'},r.name),
       h('p',{},[r.zone,r.venue,r.floor,r.location].filter(Boolean).join(' · ')),
       h('p',{},[r.dish,r.category,money(r)].filter(Boolean).join(' · ')),h('p',{},freshness(r))];
+    block.push(h('section',{class:'practical'},[
+      h('h3',{},'出发前看这里'),
+      h('p',{},'位置：'+([r.zone,r.venue,r.floor,r.location].filter(Boolean).join(' · '))),
+      h('p',{},'价格：'+(money(r)?money(r)+'（原表快照，非当日菜单）':'原表未注明')),
+      h('p',{},'营业状态：'+(r.historicalClosure?'原表提到停业，待核实':'现况待核实')),
+      h('p',{},'最近营业核实：'+(r.verifiedAt||'暂无记录；采集时间不代表营业核实时间')),
+      h('a',{href:'https://uri.amap.com/search?keyword='+encodeURIComponent('重庆 '+r.zone+' '+r.name),target:'_blank',rel:'noopener noreferrer'},'地图搜店（需核对同名门店） ↗')
+    ]));
     if(r.features)block.push(h('h3',{},'门店特点'),h('p',{},r.features));
     if(r.features||score) {
       const rating=[h('h3',{},'网络评分'),h('p',{},score?h('strong',{},rated(score)):'未查到可核实的同店公开评分')];
@@ -172,6 +204,7 @@
       block.push(h('div',{class:'platform-card'},rating));
     }
     if(traitLabels(r).length)block.push(h('div',{class:'traits'},traitLabels(r).map(t=>h('span',{},t))));
+    block.push(h('p',{class:'filter-note'},'榜单沿用原表标记；摘要中的评价分歧不改变分榜，原文段落数不等于投票人数。'));
     if(r.sources.length)block.push(h('h3',{},'学生原表'),h('ul',{},r.sources.map(s=>h('li',{},books[s.book].name+' · '+s.sheet+' · '+s.cell+' · 原标记：'+tierNames[s.mark]))));
     const quotes=r.sources.flatMap(s=>(studentReviews[[s.book,s.sheet,s.cell].join('|')]||[]).map(([cell,quote])=>
       h('figure',{class:'review-quote'},[
@@ -183,6 +216,7 @@
     else block.push(h('p',{class:'review-empty'},r.sources.length?'原表没有可展示的文字评价。':'仅有平台门店资料，未收录可核验的评价原文。'));
     if(r.external.length)block.push(h('h3',{},'外部参考'),h('ul',{},r.external.map(s=>h('li',{},s.platform+' — '+s.fact))));
     block.push(h('p',{},'价格和反馈为资料快照。具体菜单、营业和配送情况以门店当日为准。'));
+    block.push(h('a',{class:'outline',href:'feedback.html?item='+encodeURIComponent(r.id)},'报错 / 补充近期信息 →'));
     $('#detail-body').replaceChildren(...block);
     dlg.scrollTop=0;
     if(!dlg.open)dlg.showModal();
