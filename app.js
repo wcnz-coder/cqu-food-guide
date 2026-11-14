@@ -8,7 +8,7 @@
     e.append(...(Array.isArray(children)?children:[children]));
     return e;
   };
-  const tierNames={all:'全部',red:'红榜',black:'黑榜',mixed:'争议',unknown:'未分榜'};
+  const tierNames={all:'全部',red:'红榜',black:'黑榜',mixed:'争议'};
   const zones=['虎溪','A 区','B 区','C 区','老校区周边'];
   const zoneLabels=['科学城 · 虎溪','沙坪坝 · A 校区','沙坪坝 · B 校区','沙坪坝 · C 校区','沙坪坝 · 老校区'];
   const isDelivery=document.body.dataset.page==='delivery';

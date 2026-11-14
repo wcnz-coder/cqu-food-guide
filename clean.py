@@ -155,15 +155,18 @@ def main():
         for p in platform['matched']:
             if obj['zone']==p['zone'] and p['match'] in obj['name']:
                 obj['external'].append({k:v for k,v in p.items() if k not in {'match','zone'}})
-    for p in platform['discovery']:
-        k='platform-'+hashlib.sha256(p['url'].encode()).hexdigest()[:10]
-        items[k]={'id':k,'name':p['name'],'dish':p.get('dish',''),'zone':p['zone'],'venue':'校外 / 平台线索','floor':'','price':None,'category':p['category'],'signals':[],'sources':[],'tier':'unknown','historicalClosure':False,'location':p.get('location',''),'external':[{k:p[k] for k in ('platform','url','fact')}]}
-    recs=list(items.values())
+    # Publish only classified entries, including their retained source rows.
+    recs=[r for r in items.values() if r['tier']!='unknown']
+    published_sources={(s['book'],s['sheet'],s['cell']) for r in recs for s in r['sources']}
+    labels_to_books={value[0]:book for book,value in SOURCE.items()}
+    raw=[row for row in raw if (labels_to_books[row[0]],row[1],row[2]) in published_sources]
+    for book in SOURCE:
+        stats[book]=sum(b==book for b,_,_ in published_sources)
     ratings=json.loads((ROOT/'ratings.json').read_text(encoding='utf-8'))
     for r in recs:
         r.setdefault('delivery',False)
         r['reviewDate']=None
-        r['capturedAt']=args.snapshot if r['sources'] else ratings['checked']
+        r['capturedAt']=args.snapshot
         evidence=next((item for item in ratings['entries'] if r['zone']==item['zone'] and item['name'] in r['name']),None)
         r['features']=evidence['features'] if evidence else (r['external'][0]['fact'] if r['external'] else '')
         r['ratings']=[dict(obs,checked=ratings['checked']) for obs in evidence['ratings']] if evidence else []

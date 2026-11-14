@@ -6,12 +6,6 @@
     {"zone":"虎溪","match":"李火辣老火锅","platform":"商家门店展示","url":"https://8085b07d14431b37cd253742c0768627.preview.17hongtu.cn/19083/","fact":"品牌门店展示中列有重庆大学城店。"},
     {"zone":"虎溪","match":"不挂科火锅","platform":"携程美食","url":"https://you.ctrip.com/food/shanghai158/7152334-dianping.html","fact":"大学城总店标为熙街二期 17 号楼一层；页面列有毛肚、酥肉等菜品。"}
   ],
-  "discovery": [
-    {"name":"山水溶洞火锅（大学城店）","dish":"重庆火锅","zone":"虎溪","category":"火锅烤鱼","platform":"携程美食","url":"https://gs.ctrip.com/html5/you/foods/fooddetail/110000/24564268.html","location":"熙街 · 景苑路8号附21号","fact":"携程收录该店地址为景苑路 8 号附 21 号一层；未用平台评论给店铺分榜。"},
-    {"name":"星巴克（重庆大学城熙街店）","dish":"咖啡","zone":"虎溪","category":"饮品甜点","platform":"携程美食","url":"https://gs.ctrip.com/html5/you/foods/fooddetail/158/13094693.html","location":"熙街 · 景苑路8号附1号","fact":"公开门店页列出大学城熙街店的地址。"},
-    {"name":"阿嫂印象","zone":"虎溪","category":"小炒盖饭","platform":"博客园 · 个人探店","url":"https://www.cnblogs.com/vvencore/p/18874414","fact":"由个人探店笔记收录；与饭协表里的阿嫂记忆不是同名条目，未合并。"},
-    {"name":"港姐姐掌中宝串串公司（熙街店）","dish":"串串","zone":"虎溪","category":"火锅烤鱼","platform":"城市吧","url":"https://m.city8.com/chongqing/cater/7y6lmr77d39wb07f90","location":"景苑路 · 美丽熙街","fact":"公开地图条目标注在景苑路美丽熙街；地址仅供定位。"}
-  ],
   "context": [
     {"platform":"重庆大学 · 虎溪校园地图","url":"https://www.cfl.cqu.edu.cn/__local/5/84/99/88E3C66D4A9BA623245ABE69770_672470C5_96E14.pdf","fact":"用于核对校园食堂分区，不作为口味或价格来源。"},
     {"platform":"饿了么（淘宝闪购）","url":"https://www.ele.me/","fact":"未取得可公开核验的同店菜单、价格或评分，本版没有将其计作数据来源。"}

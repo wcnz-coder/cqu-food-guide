@@ -147,7 +147,6 @@ figcaption small{color:var(--t2);font-weight:var(--w-body);font-size:var(--fs-mi
 .pill.red{color:var(--hot);border-color:var(--hot);background:transparent}
 .pill.black{color:var(--d1);background:var(--ink);border-color:var(--ink)}
 .pill.mixed{color:var(--t2);border:1px dashed var(--t3);background:transparent}
-.pill.unknown{color:var(--t3);border-color:var(--line);background:transparent}
 .card h3{font:var(--w-ui) var(--fs-card)/1.24 var(--ui);letter-spacing:.01em;overflow-wrap:anywhere;text-wrap:balance}
 .card .dish{font-size:var(--fs-sm);color:var(--t3);overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .traits{color:var(--t3);font-size:var(--fs-mini)}

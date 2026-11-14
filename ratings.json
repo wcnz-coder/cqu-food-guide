@@ -66,60 +66,6 @@
     },
     {
       "zone": "虎溪",
-      "name": "山水溶洞火锅",
-      "features": "溶洞式布景；店铺相册列有红油锅底、毛肚和鸭肠。",
-      "ratings": [
-        {
-          "platform": "携程美食",
-          "group": "trip",
-          "score": 4,
-          "max": 5,
-          "count": 2,
-          "url": "https://gs.ctrip.com/html5/you/foods/fooddetail/110000/24564268.html",
-          "reviewDate": null
-        }
-      ]
-    },
-    {
-      "zone": "虎溪",
-      "name": "星巴克",
-      "features": "熙街咖啡店，平台页面列有 Wi-Fi、沙发位和多种拿铁。",
-      "ratings": [
-        {
-          "platform": "携程美食",
-          "group": "trip",
-          "score": 4.4,
-          "max": 5,
-          "count": 5,
-          "url": "https://gs.ctrip.com/html5/you/foods/fooddetail/158/13094693.html",
-          "reviewDate": null
-        }
-      ]
-    },
-    {
-      "zone": "虎溪",
-      "name": "阿嫂印象",
-      "features": "龙湖 U 城 B 馆的民间江湖菜；不与阿嫂记忆老火锅合并。",
-      "ratings": [
-        {
-          "platform": "高德地图",
-          "group": "amap",
-          "score": 4.6,
-          "max": 5,
-          "count": null,
-          "url": "https://www.amap.com/place/B0FFKTSGAL",
-          "reviewDate": "2017-11-03"
-        }
-      ]
-    },
-    {
-      "zone": "虎溪",
-      "name": "港姐姐掌中宝串串",
-      "features": "景苑路熙街串串店；公开地图只有位置，未查到同店星级。",
-      "ratings": []
-    },
-    {
-      "zone": "虎溪",
       "name": "阿嫂记忆老火锅",
       "features": "龙湖 U 城老火锅；历史点评提到现炸酥肉和自助小食。",
       "ratings": [
