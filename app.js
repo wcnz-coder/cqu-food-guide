@@ -18,31 +18,55 @@
   for(const s of context)if(!s.platform.startsWith('饿了么'))sources.set(s.platform,s);
   $('#source-links')?.append(...[...sources.values()].map(s=>h('li',{},ext(s.platform,s.url))));
   const coverage=zones.map(z=>records.filter(r=>r.zone===z).length);
+  const areaKey='cqu-last-campus';
   if($('#total')){
     $('#total').textContent=records.length;
     $('#redTotal').textContent=records.filter(r=>r.tier==='red').length;
     $('#blackTotal').textContent=records.filter(r=>r.tier==='black').length;
     const areaGrid=$('#area-grid');
-    const areaKey='cqu-last-campus';
-    let lastArea;
-    try{lastArea=sessionStorage.getItem(areaKey);}catch{}
-    const areaLinks=zones.map((z,i)=>{
-      const link=h('a',{class:'area',href:'guide.html?zone='+encodeURIComponent(z),'aria-current':z===lastArea?'true':null},
-        [h('span',{},zoneLabels[i]),h('strong',{},String(coverage[i]))]);
-      link.addEventListener('click',()=>{
-        areaGrid.querySelector('[aria-current]')?.removeAttribute('aria-current');
-        link.setAttribute('aria-current','true');
-        try{sessionStorage.setItem(areaKey,z);}catch{}
-      });
-      return link;
-    });
+    const areaLinks=zones.map((z,i)=>h('a',{class:'area',href:'guide.html?zone='+encodeURIComponent(z)},
+      [h('span',{},zoneLabels[i]),h('strong',{},String(coverage[i]))]));
     areaGrid.append(...areaLinks);
+    const markLastArea=()=>{
+      let lastArea;
+      try{lastArea=sessionStorage.getItem(areaKey);}catch{}
+      areaLinks.forEach((link,i)=>{
+        if(zones[i]===lastArea)link.setAttribute('aria-current','true');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    markLastArea();
+    window.addEventListener('pageshow',event=>{if(event.persisted)markLastArea();});
+  }
+  const pickGrid=$('#pick-grid');
+  if(pickGrid) {
+    const candidates=records.filter(r=>r.tier==='red'&&!r.historicalClosure&&(r.features||r.signals[0]));
+    let previous=new Set();
+    const pick=()=>{
+      const fresh=candidates.filter(r=>!previous.has(r.id));
+      const pool=fresh.length>=3?fresh:candidates.slice();
+      const chosen=[];
+      while(chosen.length<3&&pool.length) {
+        const i=Math.floor(Math.random()*pool.length);
+        chosen.push(pool.splice(i,1)[0]);
+      }
+      previous=new Set(chosen.map(r=>r.id));
+      pickGrid.replaceChildren(...chosen.map(r=>h('article',{class:'pick'},[
+        h('strong',{},r.name),h('p',{},r.features||r.signals[0]),
+        h('a',{href:'guide.html?item='+encodeURIComponent(r.id),'aria-label':'看详情：'+r.name},'看详情 →')
+      ])));
+    };
+    $('#repick').onclick=pick;
+    pick();
   }
   const form=$('#filters');
   if(!form) return;
   const fields=form.elements, dlg=$('#detail'), grid=$('#results');
   const paramFields=['q','zone','category','budget','evidence','party'];
   const limit=18, params=new URLSearchParams(location.search);
+  if(!isDelivery&&zones.includes(params.get('zone'))) {
+    try{sessionStorage.setItem(areaKey,params.get('zone'));}catch{}
+  }
   const norm=s=>String(s).normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,'');
   const tokens=s=>s.normalize('NFKC').toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean).slice(0,12);
   function oneEdit(a,b) {
@@ -100,8 +124,12 @@
     const block=[pill(r),h('h2',{id:'detail-title'},r.name),
       h('p',{},[r.zone,r.venue,r.floor,r.location].filter(Boolean).join(' · ')),
       h('p',{},[r.dish,r.category,money(r)].filter(Boolean).join(' · ')),h('p',{},freshness(r))];
-    if(r.features)block.push(h('h3',{},'门店特点'),h('p',{},r.features),h('h3',{},'网络评分'),h('p',{},score?rated(score):'未查到可核实的同店公开评分'));
-    if(score)block.push(h('ul',{},score.rows.map(s=>h('li',{},[ext(s.platform,s.url),': '+s.score+' / '+s.max+' · '+(s.count==null?'评论数未知':s.count+' 条')+' · 核对 '+s.checked+' · 样例测评 '+(s.reviewDate||'网页未显示日期')]))));
+    if(r.features)block.push(h('h3',{},'门店特点'),h('p',{},r.features));
+    if(r.features||score) {
+      const rating=[h('h3',{},'网络评分'),h('p',{},score?h('strong',{},rated(score)):'未查到可核实的同店公开评分')];
+      if(score)rating.push(h('ul',{},score.rows.map(s=>h('li',{},[ext(s.platform,s.url),': '+s.score+' / '+s.max+' · '+(s.count==null?'评论数未知':s.count+' 条')+' · 核对 '+s.checked+' · 样例测评 '+(s.reviewDate||'网页未显示日期')]))));
+      block.push(h('div',{class:'platform-card'},rating));
+    }
     if(traitLabels(r).length)block.push(h('div',{class:'traits'},traitLabels(r).map(t=>h('span',{},t))));
     if(r.sources.length)block.push(h('h3',{},'学生原表'),h('ul',{},r.sources.map(s=>h('li',{},[ext(books[s.book].name,books[s.book].url),' · '+s.sheet+' · '+s.cell+' · 原标记：'+tierNames[s.mark]]))));
     if(r.external.length)block.push(h('h3',{},'外部参考'),h('ul',{},r.external.map(s=>h('li',{},[ext(s.platform,s.url),' — '+s.fact]))));
@@ -112,9 +140,7 @@
   dlg.querySelector('.close').onclick=()=>dlg.close();
   dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close();});
   const card=r=>{
-    const sourceLabel=(r.sources.length?r.sources.length+' 条原表':'平台补充')+(r.delivery?' · 外卖线索':r.features&&r.sources.length?' · 有交叉出处':'');
     const btn=h('button',{type:'button','aria-label':'详情：'+r.name},'详情');
-    const score=rate(r);
     const meta=[r.zone,...(r.venue||'').split(' / '),r.floor].filter(Boolean).join(' · ');
     const traits=traitLabels(r);
     const summary=traits.slice(0,3).map(t=>h('span',{},t));
@@ -122,10 +148,8 @@
     btn.onclick=()=>details(r);
     return h('article',{class:'card'},[h('div',{class:'card-meta'},[pill(r),meta]),
       h('h3',{},r.name),h('p',{class:'dish'},[r.dish,r.category,money(r)].filter(Boolean).join(' · ')),
-      ...(r.features?[h('div',{class:'platform-card'},[h('strong',{},score?'网评分 '+rated(score):'网评未核实'),h('p',{},r.features)])]:[]),
       ...(summary.length?[h('div',{class:'traits'},summary)]:[]),
-      h('p',{class:'freshness'},freshness(r)),
-      h('div',{class:'card-foot'},[h('span',{},sourceLabel),btn])]);
+      h('div',{class:'card-foot'},[h('span',{},r.sources.length?'原表':'平台'),btn])]);
   };
   function saveURL(){
     const u=new URL(location.href);
