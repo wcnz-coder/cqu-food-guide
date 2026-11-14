@@ -11,7 +11,23 @@
   const tierNames={all:'全部',red:'红榜',black:'黑榜',mixed:'争议',unknown:'未分榜'};
   const zones=['虎溪','A 区','B 区','C 区','老校区周边'];
   const zoneLabels=['科学城 · 虎溪','沙坪坝 · A 校园','沙坪坝 · B 校园','沙坪坝 · C 校园','沙坪坝 · 未细分'];
-  const form=$('#filters'), fields=form.elements, dlg=$('#detail'), grid=$('#results');
+  const isDelivery=document.body.dataset.page==='delivery';
+  const ext=(label,url)=>h('a',{href:url,target:'_blank',rel:'noopener noreferrer'},label+' ↗');
+  const sources=new Map();
+  for(const r of records)for(const s of [...r.external,...r.ratings])if(!sources.has(s.platform))sources.set(s.platform,s);
+  for(const s of context)if(!s.platform.startsWith('饿了么'))sources.set(s.platform,s);
+  $('#source-links')?.append(...[...sources.values()].map(s=>h('li',{},ext(s.platform,s.url))));
+  const coverage=zones.map(z=>records.filter(r=>r.zone===z).length);
+  if($('#total')){
+    $('#total').textContent=records.length;
+    $('#redTotal').textContent=records.filter(r=>r.tier==='red').length;
+    $('#blackTotal').textContent=records.filter(r=>r.tier==='black').length;
+    zones.forEach((z,i)=>$('#area-grid').append(h('a',{class:'area',href:'guide.html?zone='+encodeURIComponent(z)},[h('span',{},zoneLabels[i]),h('strong',{},z+' · '+coverage[i]),h('i',{'aria-hidden':'true',style:'--coverage:'+(100*coverage[i]/Math.max(...coverage))+'%'})])));
+  }
+  const form=$('#filters');
+  if(!form) return;
+  const fields=form.elements, dlg=$('#detail'), grid=$('#results');
+  const paramFields=['q','zone','category','budget','evidence','party'];
   const limit=18, params=new URLSearchParams(location.search);
   const norm=s=>String(s).normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,'');
   const tokens=s=>s.normalize('NFKC').toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean).slice(0,12);
@@ -39,33 +55,39 @@
     }
     return 0;
   }
-  const idx=records.map(r=>({r,title:[r.name,r.dish].filter(Boolean).map(norm),meta:[r.zone,r.venue,r.floor,r.location,r.category,...r.signals].map(norm)}));
-  const byId=new Map(records.map(r=>[r.id,r]));
+  const scope=records.filter(r=>!isDelivery||r.delivery);
+  const idx=scope.map(r=>({r,title:[r.name,r.dish].filter(Boolean).map(norm),meta:[r.zone,r.venue,r.floor,r.location,r.category,r.features,...r.signals].map(norm)}));
+  const byId=new Map(scope.map(r=>[r.id,r]));
   let selected=Object.keys(tierNames).includes(params.get('tier'))?params.get('tier'):'all', page=Math.max(1,Number.parseInt(params.get('page'),10)||1), visible=[], lastDraw=null;
   for(const z of zones)fields.zone.append(h('option',{value:z},z));
   for(const c of [...new Set(records.map(r=>r.category))])fields.category.append(h('option',{value:c},c));
-  for(const name of ['q','zone','category','budget','evidence']) {
+  for(const name of paramFields) {
     if(params.has(name)) fields[name].value=params.get(name).slice(0,100);
     if(fields[name].tagName==='SELECT'&&fields[name].selectedIndex<0)fields[name].selectedIndex=0;
   }
   fields.q.maxLength=100;
-  $('#total').textContent=records.length;
-  $('#redTotal').textContent=records.filter(r=>r.tier==='red').length;
-  $('#blackTotal').textContent=records.filter(r=>r.tier==='black').length;
-  const coverage=zones.map(z=>records.filter(r=>r.zone===z).length);
-  const areaButtons=zones.map((z,i)=>{
-    const a=h('button',{class:'area',type:'button','aria-pressed':false},[h('span',{},zoneLabels[i]),h('strong',{},z+' · '+coverage[i]),h('i',{'aria-hidden':'true',style:'--coverage:'+(100*coverage[i]/Math.max(...coverage))+'%'})]);
-    a.onclick=()=>{fields.zone.value=fields.zone.value===z?'':z;selected='all';page=1;render();$('#guide').scrollIntoView({block:'start'});};
-    $('#area-grid').append(a);return a;
-  });
-  const ext=(label,url)=>h('a',{href:url,target:'_blank',rel:'noopener noreferrer'},label+' ↗');
+  const family=r=>{
+    if(r.historicalClosure) return [];
+    const words=[r.name,r.dish,r.features].join(' ');
+    const shared=/火锅|烤鱼|烧烤|烤肉|串串|江湖菜|川菜馆|炒菜馆|拼盘|分食/.test(words);
+    const solo=/粉面抄手|早餐小吃|饮品甜点/.test(r.category)||/盖饭|拌饭|自选|猪脚饭|烤鸭饭|盒饭|套饭|汉堡/.test(words);
+    const two=shared||/咖啡|甜品|烤肉|西餐|融合菜|居酒屋|日料/.test(words);
+    const many=shared&&!r.delivery&&!r.venue.includes('食堂');
+    return [solo?'one':'',two?'two':'',shared?'few':'',many?'many':''].filter(Boolean);
+  };
   const traitLabels=r=>[...(r.historicalClosure?['原表提到停业 · 待核实']:[]),...r.signals];
   const money=r=>r.price ? '原表 ¥'+r.price[0]+(r.price[0]===r.price[1]?'':'–'+r.price[1]) : '价格未收录';
   const pill=r=>h('span',{class:'pill '+r.tier},tierNames[r.tier]);
+  const rate=r=>globalThis.aggregateRatings(r.ratings);
+  const rated=x=>x.score.toFixed(2)+' / 5'+(x.rows.length>1?' · 加权':' · 单源');
+  const freshness=r=>r.sources.length?'测评：原表未注明 · 采集 '+r.capturedAt:'测评：无学生记录 · 核对 '+r.capturedAt;
   const details=r=>{
+    const score=rate(r);
     const block=[pill(r),h('h2',{id:'detail-title'},r.name),
       h('p',{},[r.zone,r.venue,r.floor,r.location].filter(Boolean).join(' · ')),
-      h('p',{},[r.dish,r.category,money(r)].filter(Boolean).join(' · '))];
+      h('p',{},[r.dish,r.category,money(r)].filter(Boolean).join(' · ')),h('p',{},freshness(r))];
+    if(r.features)block.push(h('h3',{},'门店特点'),h('p',{},r.features),h('h3',{},'网络评分'),h('p',{},score?rated(score):'未查到可核实的同店公开评分'));
+    if(score)block.push(h('ul',{},score.rows.map(s=>h('li',{},[ext(s.platform,s.url),': '+s.score+' / '+s.max+' · '+(s.count==null?'评论数未知':s.count+' 条')+' · 核对 '+s.checked+' · 样例测评 '+(s.reviewDate||'网页未显示日期')]))));
     if(traitLabels(r).length)block.push(h('div',{class:'traits'},traitLabels(r).map(t=>h('span',{},t))));
     if(r.sources.length)block.push(h('h3',{},'学生原表'),h('ul',{},r.sources.map(s=>h('li',{},[ext(books[s.book].name,books[s.book].url),' · '+s.sheet+' · '+s.cell+' · 原标记：'+tierNames[s.mark]]))));
     if(r.external.length)block.push(h('h3',{},'外部参考'),h('ul',{},r.external.map(s=>h('li',{},[ext(s.platform,s.url),' — '+s.fact]))));
@@ -76,17 +98,20 @@
   dlg.querySelector('.close').onclick=()=>dlg.close();
   dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close();});
   const card=r=>{
-    const sourceLabel=(r.sources.length?r.sources.length+' 条原表':'平台补充')+(r.external.length&&r.sources.length?' · 有交叉出处':'');
+    const sourceLabel=(r.sources.length?r.sources.length+' 条原表':'平台补充')+(r.delivery?' · 外卖线索':r.features&&r.sources.length?' · 有交叉出处':'');
     const btn=h('button',{type:'button','aria-label':'查看出处：'+r.name},'查看出处 ↗');
+    const score=rate(r);
     btn.onclick=()=>details(r);
     return h('article',{class:'card'},[h('div',{class:'card-meta'},[pill(r),[r.zone,r.venue,r.floor].filter(Boolean).join(' · ')]),
       h('h3',{},r.name),h('p',{class:'dish'},[r.dish,r.category,money(r)].filter(Boolean).join(' · ')),
+      ...(r.features?[h('div',{class:'platform-card'},[h('strong',{},score?'网评分 '+rated(score):'网评未核实'),h('p',{},r.features)])]:[]),
       h('div',{class:'traits'},traitLabels(r).slice(0,4).map(t=>h('span',{},t))),
+      h('p',{class:'freshness'},freshness(r)),
       h('div',{class:'card-foot'},[h('span',{},sourceLabel),btn])]);
   };
   function saveURL(){
     const u=new URL(location.href);
-    for(const name of ['q','zone','category','budget','evidence']) {
+    for(const name of paramFields) {
       if(fields[name].value.trim())u.searchParams.set(name,fields[name].value.trim());else u.searchParams.delete(name);
     }
     if(selected==='all')u.searchParams.delete('tier');else u.searchParams.set('tier',selected);
@@ -95,7 +120,7 @@
   }
   function render(){
     const q=tokens(fields.q.value);
-    const pool=idx.filter(({r})=>(!fields.zone.value||fields.zone.value===r.zone)&&(!fields.category.value||fields.category.value===r.category)&&(!fields.budget.value||(r.price&&r.price[1]<=Number(fields.budget.value)))&&(!fields.evidence.value||(fields.evidence.value==='cross'?r.external.length:r.sources.some(s=>s.book===fields.evidence.value))))
+    const pool=idx.filter(({r})=>(!fields.zone.value||fields.zone.value===r.zone)&&(!fields.category.value||fields.category.value===r.category)&&(!fields.budget.value||(r.price&&r.price[1]<=Number(fields.budget.value)))&&(!fields.party.value||family(r).includes(fields.party.value))&&(!fields.evidence.value||(fields.evidence.value==='cross'?!!r.features:r.sources.some(s=>s.book===fields.evidence.value))))
       .map(({r,title,meta})=>{
         const scores=q.map(t=>Math.max(0,...title.map(s=>match(t,s)*3),...meta.map(s=>s.includes(t)?12:0)));
         return {r,score:scores.every(Boolean)?scores.reduce((a,b)=>a+b,0):-1};
@@ -107,7 +132,6 @@
       b.onclick=()=>{selected=id;page=1;render();};return b;
     }));
     if(active)tierBox.querySelector('[data-tier="'+active+'"]')?.focus({preventScroll:true});
-    areaButtons.forEach((b,i)=>b.setAttribute('aria-pressed',String(fields.zone.value===zones[i])));
     visible=pool.filter(x=>selected==='all'||x.r.tier===selected).sort((a,b)=>b.score-a.score|| Number(Boolean(b.r.external.length))-Number(Boolean(a.r.external.length))).map(x=>x.r);
     const pages=Math.max(1,Math.ceil(visible.length/limit));page=Math.min(page,pages);
     const begin=(page-1)*limit;
@@ -135,10 +159,6 @@
     if(eligible.length){const choice=eligible[Math.floor(Math.random()*eligible.length)];lastDraw=choice.id;details(choice);}
   };
   document.addEventListener('keydown',e=>{if(e.key==='/'&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&!dlg.open&&!e.target.matches('input,select,textarea,[contenteditable=true]')){e.preventDefault();fields.q.focus();}});
-  const sources=new Map();
-  for(const r of records)for(const s of r.external)if(!sources.has(s.platform))sources.set(s.platform,s);
-  for(const s of context)if(!s.platform.startsWith('饿了么'))sources.set(s.platform,s);
-  $('#source-links').append(...[...sources.values()].map(s=>h('li',{},ext(s.platform,s.url))));
   render();
   if(params.has('item')&&byId.has(params.get('item')))details(byId.get(params.get('item')));
 })();

@@ -1,0 +1,138 @@
+{
+  "checked": "2026-11-14",
+  "entries": [
+    {
+      "zone": "老校区周边",
+      "name": "堂客老火锅",
+      "features": "欣阳广场总店，菜单列有堂客牛肉、鲜鸭血和酥肉。",
+      "ratings": [
+        {
+          "platform": "Trip.com",
+          "group": "trip",
+          "score": 4,
+          "max": 5,
+          "count": 5,
+          "url": "https://tw.trip.com/restaurant/china/chongqing/detail/tangkelao-hot-pot-11571535/",
+          "reviewDate": "2020-10-28"
+        }
+      ]
+    },
+    {
+      "zone": "虎溪",
+      "name": "阿亲家",
+      "features": "熙街韩式自助烤肉，以自助和烤肉为主。",
+      "ratings": [
+        {
+          "platform": "Trip.com",
+          "group": "trip",
+          "score": 4.2,
+          "max": 5,
+          "count": 5,
+          "url": "https://hk.trip.com/restaurant/yongchuan-district-120024/3/",
+          "reviewDate": null
+        },
+        {
+          "platform": "纤作同城",
+          "group": "xztc",
+          "score": 4.4,
+          "max": 5,
+          "count": null,
+          "url": "https://www.xztc.net/chongqing/kaorou/?area=shapingba",
+          "reviewDate": null
+        }
+      ]
+    },
+    {
+      "zone": "虎溪",
+      "name": "不挂科火锅",
+      "features": "熙街二期重庆老火锅；公开菜品有毛肚和酥肉，历史点评提及等位。",
+      "ratings": [
+        {
+          "platform": "Trip.com",
+          "group": "trip",
+          "score": 4,
+          "max": 5,
+          "count": 17,
+          "url": "https://hk.trip.com/restaurant/china/chongqing/detail/restaurant-15297842/",
+          "reviewDate": "2020-11-28"
+        }
+      ]
+    },
+    {
+      "zone": "虎溪",
+      "name": "李火辣老火锅",
+      "features": "大学城熙街店，主营重庆火锅；美团公开促销页不显示店铺星级。",
+      "ratings": []
+    },
+    {
+      "zone": "虎溪",
+      "name": "山水溶洞火锅",
+      "features": "溶洞式布景；店铺相册列有红油锅底、毛肚和鸭肠。",
+      "ratings": [
+        {
+          "platform": "携程美食",
+          "group": "trip",
+          "score": 4,
+          "max": 5,
+          "count": 2,
+          "url": "https://gs.ctrip.com/html5/you/foods/fooddetail/110000/24564268.html",
+          "reviewDate": null
+        }
+      ]
+    },
+    {
+      "zone": "虎溪",
+      "name": "星巴克",
+      "features": "熙街咖啡店，平台页面列有 Wi-Fi、沙发位和多种拿铁。",
+      "ratings": [
+        {
+          "platform": "携程美食",
+          "group": "trip",
+          "score": 4.4,
+          "max": 5,
+          "count": 5,
+          "url": "https://gs.ctrip.com/html5/you/foods/fooddetail/158/13094693.html",
+          "reviewDate": null
+        }
+      ]
+    },
+    {
+      "zone": "虎溪",
+      "name": "阿嫂印象",
+      "features": "龙湖 U 城 B 馆的民间江湖菜；不与阿嫂记忆老火锅合并。",
+      "ratings": [
+        {
+          "platform": "高德地图",
+          "group": "amap",
+          "score": 4.6,
+          "max": 5,
+          "count": null,
+          "url": "https://www.amap.com/place/B0FFKTSGAL",
+          "reviewDate": "2017-11-03"
+        }
+      ]
+    },
+    {
+      "zone": "虎溪",
+      "name": "港姐姐掌中宝串串",
+      "features": "景苑路熙街串串店；公开地图只有位置，未查到同店星级。",
+      "ratings": []
+    },
+    {
+      "zone": "虎溪",
+      "name": "阿嫂记忆老火锅",
+      "features": "龙湖 U 城老火锅；历史点评提到现炸酥肉和自助小食。",
+      "ratings": [
+        {
+          "platform": "Trip.com",
+          "group": "trip",
+          "score": 4.3,
+          "max": 5,
+          "count": 5,
+          "url": "https://us.trip.com/restaurant/china/chongqing/detail/restaurant-42425821/",
+          "reviewDate": "2020-11-27"
+        }
+      ]
+    }
+  ]
+}

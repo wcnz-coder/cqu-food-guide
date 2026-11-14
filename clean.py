@@ -1,6 +1,7 @@
 """Read user-supplied XLSX exports, not the online editor. Raw files are not published."""
 import argparse
 import collections
+import csv
 import hashlib
 import json
 import re
@@ -65,10 +66,13 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument('association',type=Path); ap.add_argument('campus_a',type=Path)
     ap.add_argument('--out',type=Path,default=ROOT/'data.js')
+    ap.add_argument('--snapshot',default='2026-11-14')
     args=ap.parse_args()
     items={}
     stats=collections.Counter()
-    def add(book,sheet,row,offset,name,dish,comments,rank,zone,venue,floor='',cost=None,location=''):
+    raw=[]
+    def add(book,sheet,row,offset,name,dish,comments,rank,zone,venue,floor='',cost=None,location='',delivery=False,raw_price=''):
+        raw_name,raw_dish=text(name),text(dish)
         name=clean_name(text(name)); dish=text(dish)
         if name in SKIP or re.match(r'^\dF\s*XXX$',name,re.I) or '黑榜(仅代表' in name:
             stats['excluded']+=bool(name)
@@ -84,7 +88,8 @@ def main():
         positive_text=re.sub(r'不好吃|不太好吃|不算好吃|不好喝|不推荐|不太推荐|没有.{0,6}好吃','',content)
         notes=[title for title,p in SIGNALS if re.search(p,positive_text if title=='口味反馈偏正面' else content)]
         category=next((t for t,p in CATES if re.search(p,name+' '+dish)),'其他')
-        source={'book':book,'sheet':sheet,'row':row,'cell':offset+str(row),'mark':rank}
+        source={'book':book,'sheet':sheet,'row':row,'cell':offset+str(row),'mark':rank,'reviewDate':None}
+        raw.append([SOURCE[book][0],sheet,source['cell'],raw_name,raw_dish,raw_price,rank,'外卖' if delivery else '', '',args.snapshot,SOURCE[book][1]])
         k='|'.join(map(key,(zone,venue,floor,name,dish)))
         special=key(name)
         if zone=='虎溪' and special in {key('西门干辣椒抄手'),key('雾漫里'),key('熙街 雾漫里自助烤肉')}:
@@ -98,6 +103,7 @@ def main():
             rec['historicalClosure']=rec['historicalClosure'] or closed
             rec['price']=rec['price'] or cost
         items[k]['sources'].append(source)
+        items[k]['delivery']=items[k].get('delivery',False) or delivery
         stats[book]+=1
     for book, file in [('association',args.association),('campus-a',args.campus_a)]:
         wb=load_workbook(file,data_only=True)
@@ -121,7 +127,7 @@ def main():
                         if alias: venue,floor,name,dish=alias
                         comments=[v(j) for j in range(col+2,end)]
                         if not dish and not any(comments): rank='unknown'
-                        add(book,s.title,row,s.cell(row,col).column_letter,name,dish,comments,rank,zone,venue,floor)
+                        add(book,s.title,row,s.cell(row,col).column_letter,name,dish,comments,rank,zone,venue,floor,delivery='外卖' in name or dish=='外卖')
                 else:
                     off=2 if s.title=='周边外卖小吃' else 1 if s.title=='东林食堂' else 0
                     name=v(2+off); dish=v(3+off)
@@ -141,7 +147,7 @@ def main():
                         elif row in (9,10): reviews.append(v(10))
                     elif off==0: reviews.append(v(10))
                     rank=flair(s.cell(row,1),'unknown') if any(reviews) else 'unknown'
-                    add(book,s.title,row,s.cell(row,2+off).column_letter,name,dish,reviews,rank,'A 区',s.title,floor,price(v(4+off)),v(3) if off==2 and v(2) else '')
+                    add(book,s.title,row,s.cell(row,2+off).column_letter,name,dish,reviews,rank,'A 区',s.title,floor,price(v(4+off)),v(3) if off==2 and v(2) else '',off==2 and '外卖' in v(2),v(4+off))
     platform=json.loads((ROOT/'platforms.json').read_text(encoding='utf-8'))
     for obj in items.values():
         marks={s['mark'] for s in obj['sources']} - {'unknown'}
@@ -153,7 +159,28 @@ def main():
         k='platform-'+hashlib.sha256(p['url'].encode()).hexdigest()[:10]
         items[k]={'id':k,'name':p['name'],'dish':p.get('dish',''),'zone':p['zone'],'venue':'校外 / 平台线索','floor':'','price':None,'category':p['category'],'signals':[],'sources':[],'tier':'unknown','historicalClosure':False,'location':p.get('location',''),'external':[{k:p[k] for k in ('platform','url','fact')}]}
     recs=list(items.values())
+    ratings=json.loads((ROOT/'ratings.json').read_text(encoding='utf-8'))
+    for r in recs:
+        r.setdefault('delivery',False)
+        r['reviewDate']=None
+        r['capturedAt']=args.snapshot if r['sources'] else ratings['checked']
+        evidence=next((item for item in ratings['entries'] if r['zone']==item['zone'] and item['name'] in r['name']),None)
+        r['features']=evidence['features'] if evidence else (r['external'][0]['fact'] if r['external'] else '')
+        r['ratings']=[dict(obs,checked=ratings['checked']) for obs in evidence['ratings']] if evidence else []
+        if r['external'] or evidence: r['platformCheckedAt']=ratings['checked']
     out={'records':recs,'stats':dict(stats),'books':{k:{'name':v[0],'url':v[1]} for k,v in SOURCE.items()},'context':platform['context']}
     args.out.write_text('globalThis.CQU_DATA = '+json.dumps(out,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
+    dest=args.out.parent/'downloads'
+    dest.mkdir(exist_ok=True)
+    def safe(s):
+        return "'"+s if isinstance(s,str) and re.match(r'^[=+@-]',s) else s
+    with (dest/'source-rows.csv').open('w',encoding='utf-8-sig',newline='') as handle:
+        writer=csv.writer(handle)
+        writer.writerow(['原表','工作表','单元格','原表名称','原表菜品或类型','原价文字','标记','外卖','测评日期','采集日期','出处'])
+        for line in raw:
+            title,dish=line[3:5]
+            if len(dish)>34 or re.search(r'好吃|难吃|推荐|味道|最爱|辣度',dish): dish=''
+            line[3:5]=title,dish
+            writer.writerow([safe(field) for field in line])
     print(len(recs),dict(stats),dict(collections.Counter(r['tier'] for r in recs)),dict(collections.Counter(r['zone'] for r in recs)))
 if __name__=='__main__': main()
