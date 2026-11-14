@@ -175,7 +175,7 @@ dialog::backdrop{background:var(--veil)}
 .sheet .traits{margin:11px 0}
 .review-excerpts{display:grid;gap:6px;margin:6px 0 var(--space-grid)}
 .review-quote{background:var(--surface-herb);border-inline-start:2px solid var(--herb);padding:6px var(--space-inset)}
-.review-quote blockquote{margin:0;font-size:var(--fs-sm);color:var(--t1);overflow-wrap:anywhere}
+.review-quote blockquote{margin:0;font-size:var(--fs-sm);color:var(--t1);overflow-wrap:anywhere;white-space:pre-wrap}
 .review-credit{margin-top:2px;font-size:var(--fs-mini);color:var(--t2);overflow-wrap:anywhere}
 .mast nav a[aria-current=page]{color:var(--t1);text-decoration:underline;text-underline-offset:5px}
 .routes{border-top:1px solid var(--line);padding-top:24px}

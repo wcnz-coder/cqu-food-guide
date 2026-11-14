@@ -1,11 +1,26 @@
 const assert=require('node:assert/strict');
 require('./data.js');
+require('./reviews.js');
 const {records,books,stats}=globalThis.CQU_DATA;
 const aggregate=require('./ratings.js');
 assert.equal(records.length,291);
 assert.equal(new Set(records.map(r=>r.id)).size,291);
 assert.deepEqual(['red','black','mixed','unknown'].map(t=>records.filter(r=>r.tier===t).length),[154,79,47,11]);
 const refs=records.flatMap(r=>r.sources);
+const reviewKey=s=>[s.book,s.sheet,s.cell].join('|');
+const reviews=globalThis.CQU_REVIEWS;
+assert.deepEqual(Object.keys(reviews).sort(),refs.map(reviewKey).sort());
+assert.ok(records.filter(r=>r.sources.some(s=>reviews[reviewKey(s)].length)).length>275);
+assert.deepEqual(reviews['association|虎溪榜|A17'].map(r=>r[0]),['C17','D17','E17','F17','G17']);
+for(const s of refs){
+  const entries=reviews[reviewKey(s)];
+  assert.equal(new Set(entries.map(e=>e[0])).size,entries.length);
+  for(const [cell,quote] of entries){
+    assert.equal(Number(cell.match(/^[A-Z]+([0-9]+)$/)?.[1]),s.row);
+    assert.ok(quote.trim());
+    assert.doesNotMatch(quote,/^\s*=|https?:\/\//i);
+  }
+}
 assert.equal(refs.length,stats.association+stats['campus-a']);
 assert.equal(new Set(refs.map(s=>[s.book,s.sheet,s.cell].join(':'))).size,refs.length);
 assert.equal(records.filter(r=>!r.sources.length).length,4);

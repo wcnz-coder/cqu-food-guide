@@ -118,14 +118,7 @@
   const rate=r=>globalThis.aggregateRatings(r.ratings);
   const rated=x=>x.score.toFixed(2)+' / 5'+(x.rows.length>1?' · 加权':' · 单源');
   const freshness=r=>r.sources.length?'测评：原表未注明 · 采集 '+r.capturedAt:'测评：无学生记录 · 核对 '+r.capturedAt;
-  // Only verified, short excerpts; keys refer to the original listing cells.
-  const studentExcerpts={
-    'association|虎溪榜|A17':[
-      ['C17','香惨了'],
-      ['D17','煮到后面个人感觉会有点咸而且辣'],
-      ['E17','感觉一般，更喜欢老火锅']
-    ]
-  };
+  const studentReviews=globalThis.CQU_REVIEWS||{};
   const details=r=>{
     const score=rate(r);
     const block=[pill(r),h('h2',{id:'detail-title'},r.name),
@@ -138,15 +131,15 @@
       block.push(h('div',{class:'platform-card'},rating));
     }
     if(traitLabels(r).length)block.push(h('div',{class:'traits'},traitLabels(r).map(t=>h('span',{},t))));
-    if(r.sources.length){
-      block.push(h('h3',{},'学生原表'),h('ul',{},r.sources.map(s=>h('li',{},books[s.book].name+' · '+s.sheet+' · '+s.cell+' · 原标记：'+tierNames[s.mark]))));
-      const excerpts=r.sources.flatMap(s=>(studentExcerpts[[s.book,s.sheet,s.cell].join('|')]||[]).map(([cell,quote])=>
-        h('figure',{class:'review-quote'},[
-          h('blockquote',{},'「'+quote+'」'),
-          h('div',{class:'review-credit'},books[s.book].name+' · '+s.sheet+' · '+cell)
-        ])));
-      if(excerpts.length)block.push(h('h3',{},'学生原评摘录'),h('div',{class:'review-excerpts'},excerpts));
-    }
+    if(r.sources.length)block.push(h('h3',{},'学生原表'),h('ul',{},r.sources.map(s=>h('li',{},books[s.book].name+' · '+s.sheet+' · '+s.cell+' · 原标记：'+tierNames[s.mark]))));
+    const quotes=r.sources.flatMap(s=>(studentReviews[[s.book,s.sheet,s.cell].join('|')]||[]).map(([cell,quote])=>
+      h('figure',{class:'review-quote'},[
+        h('blockquote',{},quote),
+        h('div',{class:'review-credit'},books[s.book].name+' · '+s.sheet+' · '+cell)
+      ])));
+    block.push(h('h3',{},'评价原文'));
+    if(quotes.length)block.push(h('div',{class:'review-excerpts'},quotes),h('p',{},'以上为学生个人反馈，不代表现况或站点核实结论。'));
+    else block.push(h('p',{class:'review-empty'},r.sources.length?'原表没有可展示的文字评价。':'仅有平台门店资料，未收录可核验的评价原文。'));
     if(r.external.length)block.push(h('h3',{},'外部参考'),h('ul',{},r.external.map(s=>h('li',{},s.platform+' — '+s.fact))));
     block.push(h('p',{},'价格和反馈为资料快照。具体菜单、营业和配送情况以门店当日为准。'));
     $('#detail-body').replaceChildren(...block);
