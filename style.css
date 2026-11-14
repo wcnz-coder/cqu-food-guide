@@ -298,7 +298,7 @@ html:has(dialog[open]) { overflow: hidden }
 .platform-card h3 { margin: 0 }
 .platform-card ul { margin-block: 4px 2px }
 
-/* The guide uses the same blue stationery as the data notes. Tier names stay distinct. */
+/* Blue is reserved for general guide controls, never for a tier identity. */
 body[data-page=guide] :focus-visible { outline-color: var(--blue) }
 body[data-page=guide] .mast nav a[aria-current=page],
 .directory .spot-filter, #detail .close {
@@ -314,15 +314,27 @@ body[data-page=guide] .nav-cta,
 .directory :is(.tiers button[aria-pressed=true],.pager[aria-current=page]) {
   background: var(--blue); border-color: var(--blue); color: #fff;
 }
-.directory .card:has(.pill.red) {
-  background: var(--blue-light); border-color: var(--blue-line); box-shadow: 0 3px 0 #dde6f4;
+body[data-page=guide] :is(.pill.red,.card:has(.pill.red),[data-tier=red]) {
+  --tier-ink: #922e2b; --tier-tint: #fff0ed; --tier-line: #c86c64;
 }
-body[data-page=guide] .pill.red {
-  display: inline-flex; align-items: center; gap: 5px;
-  background: #dfe9fa; color: var(--blue-dark);
+body[data-page=guide] :is(.pill.black,.card:has(.pill.black),[data-tier=black]) {
+  --tier-ink: #303035; --tier-tint: #f2f2f3; --tier-line: #77777c;
 }
-body[data-page=guide] .pill.red::before {
-  content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--red);
+body[data-page=guide] :is(.pill.mixed,.card:has(.pill.mixed),[data-tier=mixed]) {
+  --tier-ink: #78521a; --tier-tint: #fff5dc; --tier-line: #b18a49;
+}
+.directory .card:has(.pill:is(.red,.black,.mixed)) {
+  background: var(--tier-tint); border-color: var(--tier-line);
+  border-inline-start: 4px solid var(--tier-ink);
+}
+body[data-page=guide] .pill:is(.red,.black,.mixed) {
+  background: var(--tier-ink); color: #fff;
+}
+.directory .tiers button[data-tier]:not([data-tier=all]) {
+  background: var(--tier-tint); border-color: var(--tier-line); color: var(--tier-ink);
+}
+.directory .tiers button[data-tier]:not([data-tier=all])[aria-pressed=true] {
+  background: var(--tier-ink); border-color: var(--tier-ink); color: #fff;
 }
 
 @media (hover: hover) {
@@ -340,7 +352,10 @@ body[data-page=guide] .pill.red::before {
   .directory :is(#surprise:not(:disabled),.linkbtn,.tiers button:not([aria-pressed=true]),.pager:not([aria-current=page])):hover,
   #detail .close:hover { background: var(--blue-light); border-color: #a9bfdf; color: var(--blue-dark) }
   body[data-page=guide] .nav-cta:hover { background: var(--blue-dark); border-color: var(--blue-dark); color: #fff }
-  .directory .card:has(.pill.red):hover { border-color: #a9bfdf }
+  .directory .card:has(.pill:is(.red,.black,.mixed)):hover { border-color: var(--tier-ink) }
+  .directory .tiers button[data-tier]:not([data-tier=all]):not([aria-pressed=true]):hover {
+    border-color: var(--tier-ink); color: var(--tier-ink); background: var(--tier-tint);
+  }
 }
 
 @media (max-width: 1000px) {
