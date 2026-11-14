@@ -7,12 +7,13 @@
   <script>
     const target=new URL('guide.html',location.href);
     target.search=location.search;
-    target.searchParams.set('delivery','1');
+    target.searchParams.delete('delivery');
+    target.searchParams.set('service','delivery');
     target.hash=location.hash;
     location.replace(target.href);
   </script>
 </head>
 <body>
-  <p>外卖已并入红黑榜。<a href="guide.html?delivery=1">查看外卖筛选</a></p>
+  <p>外卖已并入红黑榜。<a href="guide.html?service=delivery">查看外卖筛选</a></p>
 </body>
 </html>
