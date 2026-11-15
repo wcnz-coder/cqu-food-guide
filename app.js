@@ -103,8 +103,8 @@
         h('strong',{},r.name),h('p',{},r.features||summarizeSignals(r).join(' · ')||'查看原表评价'),
         h('a',{href:'guide.html?item='+encodeURIComponent(r.id),'aria-label':'看详情：'+r.name},'看详情 →')
       ])));
-      if(!chosen.length)pickGrid.append(h('p',{class:'empty'},'当前校区和预算下暂无可抽选的红榜。请放宽预算或更换校区；未知价格不会按低价处理。'));
-      $('#pick-note').textContent=(quick.elements.zone.value||'全部校区')+' · '+(quick.elements.budget.value?quick.elements.budget.value+' 元以内（隐藏未知价格）':'预算不限')+' · 排除原表提到停业的条目；营业现况待核实';
+      if(!chosen.length)pickGrid.append(h('p',{class:'empty'},'当前校区和预算下暂无可抽选的红榜。试试调整预算或校区。'));
+      $('#pick-note').textContent=(quick.elements.zone.value||'全部校区')+' · '+(quick.elements.budget.value?quick.elements.budget.value+' 元以内（隐藏未知价格）':'预算不限');
       if(animate)settle(pickGrid,{duration:290,rise:9});
     };
     quick.addEventListener('change',()=>{
@@ -177,7 +177,7 @@
     const many=shared&&!r.delivery&&!r.venue.includes('食堂');
     return [solo?'one':'',two?'two':'',shared?'few':'',many?'many':''].filter(Boolean);
   };
-  const traitLabels=r=>[...(r.historicalClosure?['原表提到停业 · 待核实']:[]),...summarizeSignals(r)];
+  const traitLabels=r=>[...(r.historicalClosure?['原表提到停业']:[]),...summarizeSignals(r)];
   const money=r=>r.price ? '¥'+r.price[0]+(r.price[0]===r.price[1]?'':'–'+r.price[1]) : '';
   const pill=r=>h('span',{class:'pill '+r.tier},tierNames[r.tier]);
   const rate=r=>globalThis.aggregateRatings(r.ratings);
@@ -190,12 +190,11 @@
       h('p',{},[r.zone,r.venue,r.floor,r.location].filter(Boolean).join(' · ')),
       h('p',{},[r.dish,r.category,money(r)].filter(Boolean).join(' · ')),h('p',{},freshness(r))];
     block.push(h('section',{class:'practical'},[
-      h('h3',{},'出发前看这里'),
+      h('h3',{},'门店信息'),
       h('p',{},'位置：'+([r.zone,r.venue,r.floor,r.location].filter(Boolean).join(' · '))),
-      h('p',{},'价格：'+(money(r)?money(r)+'（原表快照，非当日菜单）':'原表未注明')),
-      h('p',{},'营业状态：'+(r.historicalClosure?'原表提到停业，待核实':'现况待核实')),
-      h('p',{},'最近营业核实：'+(r.verifiedAt||'暂无记录；采集时间不代表营业核实时间')),
-      h('a',{href:'https://uri.amap.com/search?keyword='+encodeURIComponent('重庆 '+r.zone+' '+r.name),target:'_blank',rel:'noopener noreferrer'},'地图搜店（需核对同名门店） ↗')
+      h('p',{},'原表价格：'+(money(r)||'未收录')),
+      ...(r.historicalClosure?[h('p',{},'营业记录：原表提到停业')]:[]),
+      ...(r.verifiedAt?[h('p',{},'营业核实日期：'+r.verifiedAt)]:[])
     ]));
     if(r.features)block.push(h('h3',{},'门店特点'),h('p',{},r.features));
     if(r.features||score) {
@@ -204,7 +203,6 @@
       block.push(h('div',{class:'platform-card'},rating));
     }
     if(traitLabels(r).length)block.push(h('div',{class:'traits'},traitLabels(r).map(t=>h('span',{},t))));
-    block.push(h('p',{class:'filter-note'},'榜单沿用原表标记；摘要中的评价分歧不改变分榜，原文段落数不等于投票人数。'));
     if(r.sources.length)block.push(h('h3',{},'学生原表'),h('ul',{},r.sources.map(s=>h('li',{},books[s.book].name+' · '+s.sheet+' · '+s.cell+' · 原标记：'+tierNames[s.mark]))));
     const quotes=r.sources.flatMap(s=>(studentReviews[[s.book,s.sheet,s.cell].join('|')]||[]).map(([cell,quote])=>
       h('figure',{class:'review-quote'},[
@@ -212,10 +210,9 @@
         h('div',{class:'review-credit'},books[s.book].name+' · '+s.sheet+' · '+cell)
       ])));
     block.push(h('h3',{},'评价原文'));
-    if(quotes.length)block.push(h('div',{class:'review-excerpts'},quotes),h('p',{},'以上为学生个人反馈，不代表现况或站点核实结论。'));
+    if(quotes.length)block.push(h('div',{class:'review-excerpts'},quotes));
     else block.push(h('p',{class:'review-empty'},r.sources.length?'原表没有可展示的文字评价。':'仅有平台门店资料，未收录可核验的评价原文。'));
     if(r.external.length)block.push(h('h3',{},'外部参考'),h('ul',{},r.external.map(s=>h('li',{},s.platform+' — '+s.fact))));
-    block.push(h('p',{},'价格和反馈为资料快照。具体菜单、营业和配送情况以门店当日为准。'));
     block.push(h('a',{class:'outline',href:'feedback.html?item='+encodeURIComponent(r.id)},'报错 / 补充近期信息 →'));
     $('#detail-body').replaceChildren(...block);
     dlg.scrollTop=0;

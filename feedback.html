@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#fff9ec">
-  <meta name="description" content="重庆大学非官方校园美食指南。学生共创原表、校区检索和可追溯的门店参考。">
+  <meta name="description" content="重大开饭：学生整理的重庆大学校园美食指南，支持按校区、品类和预算查找。">
   <title>纠错与补充 · 重大开饭</title>
   <link rel="icon" href="mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=decision-2">
   <script src="data.js" defer></script>
   <script src="reviews.js" defer></script>
   <script src="ratings.js" defer></script>
-  <script src="feedback.js" defer></script>
+  <script src="feedback.js?v=copy-4" defer></script>
 </head>
 <body data-page="guide">
 <a class="skip" href="#main">跳到正文</a>
@@ -20,14 +20,13 @@
     <nav aria-label="主导航"><a href="./">首页</a><a href="guide.html">红黑榜</a><a href="sources.html">数据</a></nav>
     <a class="nav-cta" href="guide.html">查榜 <span aria-hidden="true">↗</span></a>
   </header>
-<main id="main" class="frame"><section class="section"><p class="eyebrow">KEEP THE GUIDE USEFUL</p><h1>让下一顿更靠谱</h1><p>提交停业、搬迁、价格或位置变化，也可以补充近期体验。</p><p>这是静态网站：先生成反馈文件，或打开 GitHub Issue 草稿；需要你登录并提交后才会发送。反馈经维护者核实后再更新。</p>
+<main id="main" class="frame"><section class="section"><p class="eyebrow">KEEP THE GUIDE USEFUL</p><h1>让下一顿更靠谱</h1><p>提交停业、搬迁、价格或位置变化，也可以补充近期体验。</p><p>可下载反馈文件，或在 GitHub 登录后公开提交。</p>
 <form id="feedback-form" class="feedback-form">
 <label>对应条目<select name="item" required><option value="">请选择条目</option></select></label>
 <label>反馈类型<select name="kind"><option>已停业 / 搬迁</option><option>价格变化</option><option>位置不准确</option><option>补充近期体验</option><option>其他纠错</option></select></label>
 <label>实地观察日期<input type="date" name="observed" required></label>
 <label>具体情况<textarea name="detail" required minlength="5" maxlength="3000" placeholder="请描述具体门店、变化内容和依据。"></textarea></label>
 <label>可公开的参考链接（选填）<input type="url" name="evidence" placeholder="https://"></label>
-<small>请勿填写手机号、学号等个人信息；GitHub Issue 内容可能公开。一次反馈不直接改变分榜。</small>
-<div class="feedback-actions"><button class="solid" type="submit">生成反馈文件</button><button class="outline" type="button" id="issue-draft">打开 GitHub 草稿 ↗</button></div>
+<div class="feedback-actions"><button class="solid" type="submit">生成反馈文件</button><button class="outline" type="button" id="issue-draft">在 GitHub 公开反馈 ↗</button></div>
 <p id="feedback-status" role="status"></p></form></section></main>
 <footer class="frame"><a href="guide.html">返回红黑榜</a><a href="sources.html">数据与出处</a></footer></body></html>

@@ -18,6 +18,9 @@ console.log('LABELS: '+pancake.querySelector('.traits').textContent);
 console.log('DINE-IN: '+d.querySelector('[value="dine-in"]').textContent);
 pancake.querySelector('button').click();
 console.log('DETAIL correction link: '+!!d.querySelector('#detail-body a[href^="feedback.html"]'));
+assert.equal(d.querySelector('#detail-body a[href*="amap.com"]'),null);
+assert.doesNotMatch(d.querySelector('#detail-body').textContent,/不代表现况|以门店当日为准|不等于投票人数/);
+assert.ok(d.querySelector('#detail-body .practical').textContent.includes('原表价格'));
 const home=load('index.html'),hd=home.document,quick=hd.querySelector('#quick-search');
 console.log('HOME quick search: '+!!quick);
 console.log('HOME mixed total: '+(hd.querySelector('#mixedTotal')?.textContent||'absent'));
@@ -37,7 +40,7 @@ if(quick){
  let opened='';fb.open=url=>{opened=url};fb.document.querySelector('#issue-draft').click();
  assert.ok(opened.startsWith('https://github.com/wcnz-coder/cqu-food-guide/issues/new?'));assert.ok(new URL(opened).searchParams.get('body').includes('3a891c2aac2ea'));
  let blob=false;fb.URL.createObjectURL=()=>{blob=true;return 'blob:test'};fb.URL.revokeObjectURL=()=>{};fb.HTMLAnchorElement.prototype.click=function(){};
- form.dispatchEvent(new fb.Event('submit',{bubbles:true,cancelable:true}));assert.ok(blob);assert.ok(fb.document.querySelector('[role=status]').textContent.includes('尚未发送'));
+ form.dispatchEvent(new fb.Event('submit',{bubbles:true,cancelable:true}));assert.ok(blob);assert.ok(fb.document.querySelector('[role=status]').textContent.includes('已生成反馈文件'));
  console.log('FILTER empty state, feedback validation, GitHub draft, JSON export: PASS');
  fb.close();budget.close();empty.close();
 }

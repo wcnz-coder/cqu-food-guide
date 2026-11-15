@@ -17,13 +17,13 @@
     event.preventDefault();const data=draft();if(!data)return;
     const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}));
     const a=document.createElement('a');a.href=url;a.download='cqu-feedback-'+data.itemId+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-    status.textContent='已生成反馈文件，尚未发送。可将文件交给维护者，或打开 GitHub 草稿并提交。';
+    status.textContent='已生成反馈文件，可转交维护者。';
   });
   document.querySelector('#issue-draft').onclick=()=>{
     const data=draft();if(!data)return;
-    const body='条目 ID：'+data.itemId+'\n校区：'+data.zone+'\n观察日期：'+data.observedAt+'\n类型：'+data.kind+'\n\n'+data.detail+'\n\n参考：'+(data.evidence||'未提供')+'\n\n状态：待核实（不自动覆盖原数据）';
+    const body='条目 ID：'+data.itemId+'\n校区：'+data.zone+'\n观察日期：'+data.observedAt+'\n类型：'+data.kind+'\n\n'+data.detail+'\n\n参考：'+(data.evidence||'未提供')+'\n\n状态：待处理';
     const url=new URL('https://github.com/wcnz-coder/cqu-food-guide/issues/new');url.searchParams.set('title','[信息纠错] '+data.name);url.searchParams.set('body',body);
     if(url.href.length>7500){status.textContent='反馈较长，请生成完整反馈文件，再在 GitHub Issue 中附上，避免链接截断。';return;}
-    window.open(url.href,'_blank','noopener,noreferrer');status.textContent='已请求打开 GitHub 草稿，尚未提交；需在 GitHub 登录并确认发送。';
+    window.open(url.href,'_blank','noopener,noreferrer');status.textContent='请在 GitHub 草稿中确认并提交。';
   };
 })();
