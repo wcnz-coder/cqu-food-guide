@@ -21,6 +21,8 @@ console.log('DETAIL correction link: '+!!d.querySelector('#detail-body a[href^="
 assert.equal(d.querySelector('#detail-body a[href*="amap.com"]'),null);
 assert.doesNotMatch(d.querySelector('#detail-body').textContent,/不代表现况|以门店当日为准|不等于投票人数/);
 assert.ok(d.querySelector('#detail-body .practical').textContent.includes('原表价格'));
+assert.ok(d.querySelector('#detail-body').textContent.includes('采集日期：2026-11-14'));
+assert.doesNotMatch(d.querySelector('#detail-body').textContent,/测评：原表未注明|测评：无学生记录/);
 const home=load('index.html'),hd=home.document,quick=hd.querySelector('#quick-search');
 console.log('HOME quick search: '+!!quick);
 console.log('HOME mixed total: '+(hd.querySelector('#mixedTotal')?.textContent||'absent'));

@@ -1,6 +1,6 @@
 # 重大开饭 · CQU Food Index
 
-[在线查榜](https://wcnz-coder.github.io/cqu-food-guide/) · 学生整理的重庆大学校园饮食指南。
+[在线查榜](https://wcnz-coder.github.io/cqu-food-guide/) · 重庆大学非官方校园饮食指南，由学生整理。
 
 **280 条记录**，涵盖虎溪、沙坪坝 A/B/C 校园及老校区未细分地点。可按校区、榜单、品类、预算、原表来源交叉筛选。搜索支持少量漏字、错字及邻字换序，精准结果优先；筛选状态保存在网址中。
 

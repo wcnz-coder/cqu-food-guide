@@ -182,13 +182,17 @@
   const pill=r=>h('span',{class:'pill '+r.tier},tierNames[r.tier]);
   const rate=r=>globalThis.aggregateRatings(r.ratings);
   const rated=x=>x.score.toFixed(2)+' / 5'+(x.rows.length>1?' · 加权':' · 单源');
-  const freshness=r=>r.sources.length?'测评：原表未注明 · 采集 '+r.capturedAt:'测评：无学生记录 · 核对 '+r.capturedAt;
+  const freshness=r=>[
+    r.reviewDate&&'测评：'+r.reviewDate,
+    r.capturedAt&&(r.sources.length?'采集日期：':'核对日期：')+r.capturedAt
+  ].filter(Boolean).join(' · ');
   const studentReviews=globalThis.CQU_REVIEWS||{};
   const details=r=>{
     const score=rate(r);
+    const dates=freshness(r);
     const block=[pill(r),h('h2',{id:'detail-title'},r.name),
       h('p',{},[r.zone,r.venue,r.floor,r.location].filter(Boolean).join(' · ')),
-      h('p',{},[r.dish,r.category,money(r)].filter(Boolean).join(' · ')),h('p',{},freshness(r))];
+      h('p',{},[r.dish,r.category,money(r)].filter(Boolean).join(' · ')),...(dates?[h('p',{},dates)]:[])];
     block.push(h('section',{class:'practical'},[
       h('h3',{},'门店信息'),
       h('p',{},'位置：'+([r.zone,r.venue,r.floor,r.location].filter(Boolean).join(' · '))),
